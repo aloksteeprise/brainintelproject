@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import Login from "./component/User/Login";
-import RecorderPage from "./component/Recorder/Recorderpage_old";
+import RecorderPage from "./component/Recorder/Recorderpage";
 import ResetPassword from "./component/User/ResetPassword";
 
 
