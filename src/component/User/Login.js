@@ -28,8 +28,10 @@ const Login = () => {
   const [password, setpassword] = React.useState('');
   const [error, setError] = React.useState('');
   const [page, setPage] = React.useState('login');
+ 
 
   React.useEffect(() => {
+    localStorage.clear();
     setError(false);
   }, []);
 
