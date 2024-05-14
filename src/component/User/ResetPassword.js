@@ -14,6 +14,7 @@ import Helplink from '../../layout/Header/HelpLink';
 import config from '../../translation/config';
 import {resetPassword} from '../../service/Authservice';
 import {useNavigate } from 'react-router-dom';
+import {handleConfirmResetPassword} from '../../service/Authservice';
 
 
 const ResetPassword = (props) => {
@@ -24,6 +25,7 @@ const ResetPassword = (props) => {
 
     const [password, setPassword]= React.useState('');
     const [confirmpassword, setConfirmPassword]= React.useState('');
+    const [otpcode, setOtpcode]= React.useState('');
     const [token, setToken]= React.useState('');
     const [errorMsg, setErrorMsg] = React.useState('');
     const navigate=useNavigate();
@@ -66,6 +68,21 @@ const ResetPassword = (props) => {
         }    
     }
 
+    const username= JSON.parse(localStorage.getItem('items'));
+
+    const verifyEmailOTPds =  async (ev) => {   
+        ev.preventDefault();
+        debugger;
+        try{
+            handleConfirmResetPassword(username,otpcode,password);
+            navigate('/');
+            localStorage.removeItem("items")
+        }
+        catch(err){
+            console.log('thes are the errors', err);
+        }
+    }
+   
  
 return(
         <Box sx={{flexGrow: 1, overflow:'hidden'}}>
@@ -88,6 +105,19 @@ return(
                                 <p style={{fontSize: 'small', color:'red', justifyContent:'center', display: 'flex'}}>{errorMsg}</p>
                             </Typography> :null
                     }
+                     <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>    
+                        <StyledInput id="outlined-basic" label="Enter the OTP" variant="outlined" onChange={(ev) => setOtpcode(ev.target.value)} 
+                                    value={otpcode}   style={{width:'315px'}} type='number'
+                                    // InputProps={{
+                                    //     endAdornment: (
+                                    //         <InputAdornment position='end' >
+                                    //            { showPassword ? <VisibilityOff onClick={() => setShowPassword(false)}/>:
+                                    //                             <Visibility  onClick={() =>setShowPassword(true)}/> }
+                                    //         </InputAdornment>
+                                    //     )
+                                    // }}
+                                    required/>        
+                    </Typography>
                     <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>    
                         <StyledInput id="outlined-basic" label="New Password" variant="outlined" onChange={(ev) => setPassword(ev.target.value)} 
                                     value={password}   style={{width:'315px'}} type={showPassword? 'text': 'password'}
@@ -120,7 +150,7 @@ return(
                     <Button variant='oulined'  startIcon={<ArrowBack/>} color="#333E5B" style={{marginRight: '150px'}}
                           onClick={backtoLogin}>Back
                         </Button>
-                        <PrimaryButton variant='contained' className='buttonPrimarylogin' onClick={resetPasswordAPI}
+                        <PrimaryButton variant='contained' className='buttonPrimarylogin' onClick={verifyEmailOTPds}
                             >{config.resetButton}
                         </PrimaryButton>
                     </Typography>  

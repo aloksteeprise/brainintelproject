@@ -9,13 +9,13 @@ import HeaderLogin from '../../layout/Header/HeaderLogin'
 import Helplink from '../../layout/Header/HelpLink';
 import Footer from '../../layout/Footer/Footer';
 import config from '../../translation/config';
-import {forgotPassowrd} from '../../service/Authservice';
+import {resetPassword} from '../../service/Authservice';
 import './Login.scss';
+import { Auth } from 'aws-amplify';
 
 
 
 const ForgotPassword= (props) => {
-
 
     const navigate = useNavigate ();
     const [email, setEmail]= React.useState('');
@@ -24,6 +24,10 @@ const ForgotPassword= (props) => {
     const [isRequiredMessage, setIsRequiredmsg] = React.useState(false);
     const [signupErrorMesageshow,setSignupErrormsgShow]= React.useState(false)
     const [signupErrorMesage, setSignupErrormsg]=React.useState('');
+
+    React.useEffect(() => {
+        localStorage.setItem('items', JSON.stringify(email));
+      }, [email]);
 
 
     React.useEffect(() => {
@@ -48,11 +52,15 @@ const ForgotPassword= (props) => {
       };
 
       const checkValidation =async() => {
+
+        debugger;
         if(email.length === 0  ){
             
             setIsRequiredmsg(true);
         }
+        
         else if(!(validateEmail(email))) {
+            debugger;
             setErrorMailMessage('Invalid email');
             setIsRequiredmsg(false);
 
@@ -68,10 +76,10 @@ const ForgotPassword= (props) => {
             setIsRequiredmsg(false);
             //setErrorMailMessage('');
             setSignupErrormsgShow(false)
-            const forgotPasswordResult= await forgotPassowrd(email);
-            debugger;
+            const forgotPasswordResult= await resetPassword(email);
+            navigate('/reset')
             if(forgotPasswordResult!== 'success'){
-                setErrorMailMessage(forgotPasswordResult);
+                // setErrorMailMessage(forgotPasswordResult);
             }
             else {
                 setErrorMailMessage('')
@@ -81,6 +89,7 @@ const ForgotPassword= (props) => {
       }
     
     const forgotPassword = async(ev) => {
+        debugger;
         ev.preventDefault();
         try{
             checkValidation();
@@ -115,7 +124,7 @@ const ForgotPassword= (props) => {
                     <p style={{fontSize: 'small', color:'red', justifyContent:'center', display: 'flex'}}>{signupErrorMesage}</p>
                 </Typography>
                 :  errMailMessage.length > 0 ?
-                <Typography>
+                <Typography>    
                     <p style={{fontSize: 'small', color:'red', justifyContent:'center', display: 'flex'}}>{errMailMessage}</p>
                 </Typography> : null
                 

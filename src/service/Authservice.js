@@ -5,6 +5,9 @@ import { fetchAuthSession, getCurrentUser, signIn, signOut, verifyTOTPSetup, sig
 import { Amplify } from 'aws-amplify';
 import awsconfig from '../aws-exports';
 import {withAuthenticator } from '@aws-amplify/ui-react'
+import { confirmResetPassword } from 'aws-amplify/auth';
+
+import { resetPassword as awsResetPassword  } from 'aws-amplify/auth';
 Amplify.configure(awsconfig);
 
 function decodeJWT(token) {
@@ -61,21 +64,20 @@ export const verifyEmail = async (email, verificationCode) => {
     username: email,
     confirmationCode: verificationCode
   });
-
-  
-            //setMessage("Email verification successful. You can now sign in.");
-  // const response = await axios.get(
-  //   `https://dqxrg92yu7.execute-api.ap-south-1.amazonaws.com/prod/email-verification`,
-  //   {
-  //     params: {
-  //       token: token,
-  //     },
-  //   }
-  // );
-
-  
   return response;
 };
+
+// Define the handleConfirmResetPassword function
+
+export const handleConfirmResetPassword = async ( username,confirmationCode,  newPassword ) => {
+  try {
+    debugger;
+    await confirmResetPassword({username,confirmationCode,  newPassword });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 
 export const register = async (email, firstName, lastName, password) => {
   
@@ -117,6 +119,20 @@ debugger;
   return result;
 };
 
+
+
+
+export const resetPassword = async function handleResetPassword(username) {
+  try {
+    debugger;
+    const output = await awsResetPassword({ username });
+    handleResetPasswordNextSteps(output);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
 export const forgotPassowrd = async (email) => {
   let forgotPassowrdResponse;
   // const response = await axios.post(`${host}users/password-reset-request`, {
@@ -155,17 +171,17 @@ function handleResetPasswordNextSteps(output) {
 }
 
 
-export const resetPassword = async (token, newPassword) => {
-  // const response = await axios.post(
-  //   `https://dqxrg92yu7.execute-api.ap-south-1.amazonaws.com/prod/password-reset`,
-  //   {
-  //     token: token,
-  //     password: newPassword,
-  //   }
-  // );
-  console.log('response');
-  //console.log(response);
-};
+// export const resetPassword = async (token, newPassword) => {
+//   // const response = await axios.post(
+//   //   `https://dqxrg92yu7.execute-api.ap-south-1.amazonaws.com/prod/password-reset`,
+//   //   {
+//   //     token: token,
+//   //     password: newPassword,
+//   //   }
+//   // );
+//   console.log('response');
+//   //console.log(response);
+// };
 
 export const isAuthenticated = () => {
   const user = localStorage.getItem('userObject');
