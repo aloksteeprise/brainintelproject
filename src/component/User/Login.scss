@@ -1,0 +1,175 @@
+@import '../../mixin.scss';
+
+.appForm {
+  overflow: hidden;
+}
+
+.subheading {
+  text-align: center;
+  font-family: 'Proxima';
+  color: '#333E5B';
+}
+
+#outlined-basic {
+  border-color: #333e5b57 !important;
+  width: 294px;
+  font-family: 'Proxima' !important;
+  border-radius: 10px;
+  padding: 15px 26px;
+  // color: #333e5b57!important;
+}
+#outlined-basic-password {
+  border-color: #333e5b57 !important;
+  width: 273px;
+  font-family: 'Proxima' !important;
+  border-radius: 10px;
+  padding: 15px 20px;
+  // color: #333e5b57!important;
+}
+
+.footernote {
+  font-size: 10px;
+  color: #333e5b;
+  font-family: 'Proxima';
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+  // align-items: flex-start;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  font-family: 'Proxima';
+  margin-top: 15px;
+  > a {
+    font-size: 12px;
+  }
+}
+
+.password-img {
+  // position:absolute;
+  // top:50%;
+  // left:90%;
+}
+
+.buttonPrimarylogin {
+  @include buttonPrimary;
+}
+
+.buttonPrimaryReset {
+  @include buttonPrimary;
+  position: relative;
+  left: 30px;
+}
+
+.no-account {
+  margin-top: 50px;
+  color: #333e5b;
+  font-size: 15px;
+  text-align: center;
+  font-family: 'Proxima';
+}
+
+.redirectLogin {
+  position: relative;
+  right: 30px;
+}
+
+.otp {
+  display: inline-block;
+  width: 35px;
+  height: 60px;
+  text-align: center;
+  margin: 5px;
+  background-color: #eff0f7;
+  border: 0;
+  border-radius: 4px;
+  color: black;
+}
+.otpInputDiv {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+
+.otp-message {
+  margin-top: 14px;
+  font-size: 12px;
+  color: #333e5b;
+  display: 'flex';
+  justify-content: 'center';
+}
+
+.authenticator-note {
+  text-align: center;
+  color: #333e5b;
+  font-size: 13px;
+  font-family: 'Proxima';
+}
+
+.card-content {
+  font-weight: bold;
+  position: relative;
+  left: 32px;
+}
+.card-content-cont {
+  width: 262px;
+}
+
+.icon-img {
+  height: 14px;
+  position: relative;
+  top: 5px;
+}
+.arrow-img {
+  height: 12px;
+  position: relative;
+  top: 12px;
+  left: 15px;
+  cursor: pointer;
+}
+
+.error-stmt {
+  color: red;
+  text-align: center;
+  font-size: 10px;
+}
+
+.tacbox {
+  display: block;
+  // padding: 1em;
+  // margin: 2em;
+  // border: 3px solid #ddd;
+  // background-color: #eee;
+  // max-width: 800px;
+}
+
+.checkbox-class {
+  height: 1em;
+  width: 2em;
+  vertical-align: middle;
+}
+
+.modalClose {
+  text-align: right;
+  font-size: large;
+  cursor: pointer;
+}
+
+.react-pdf__Page__canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
+  z-index: 0 !important;
+}
+.grid-appside {
+  // background-image: url('../../../public/mind.png');
+}
+
+.logo-heading {
+  font-family: 'Proxima-boldHeading';
+}

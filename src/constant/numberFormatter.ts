@@ -1,0 +1,30 @@
+const numberFormatter  =(num: number) => {
+    if(num > 999 && num < 1000000){
+        return (num/1000).toFixed(1) + 'K'; // convert to K for number from > 1000 < 1 million 
+    }else if(num > 1000000){
+        return (num/1000000).toFixed(1) + 'M'; // convert to M for number from > 1 million 
+    }else if(num < 900){
+        return num; // if value < 1000, nothing to do
+    }
+
+}
+
+export default numberFormatter;
+
+export const getValues =(values:any, min:number, max:number) => {
+    let count;
+
+    const result = values.filter((item:any) => {
+        return item?.age > min && item?.age<=max;
+    })
+
+    result.forEach((item:any) => {
+       
+        count=+item?.count;
+ 
+    })
+    return count;
+  
+ 
+}
+

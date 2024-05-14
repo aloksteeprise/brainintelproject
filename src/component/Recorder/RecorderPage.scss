@@ -1,0 +1,148 @@
+@import '../../mixin.scss';
+
+.App {
+  height: 100vh;
+  background-image: url('../../images/Login-image.svg');
+  overflow: hidden;
+}
+
+.main-div {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.first {
+  flex: auto 1 auto;
+  width: 30%;
+  font-family: 'Prooxima-bold';
+}
+
+.head {
+  font-size: 28px;
+  text-align: center;
+  font-family: 'Proxima';
+}
+
+.para {
+  text-align: center;
+  font-family: 'Proxima';
+}
+
+.button {
+  font-family: 'Proxima';
+  cursor: pointer;
+  margin: 20px auto;
+  display: block;
+  height: 32px;
+  width: 160px;
+}
+
+.icon-div {
+  text-align: center;
+  padding-top: 25px;
+}
+
+.Recording {
+  padding-top: 15px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn {
+  display: flex;
+  justify-content: center;
+}
+
+.audio {
+  margin: 0 auto;
+  display: block;
+}
+
+@media (max-width: 992px) {
+  .first {
+    flex: auto 1 auto;
+    width: 45%;
+  }
+}
+
+@media (max-width: 768px) {
+  .first {
+    flex: auto 1 auto;
+    width: 55%;
+  }
+}
+
+@media (max-width: 480px) {
+  .first {
+    flex: auto 1 auto;
+    width: 75%;
+  }
+
+  .head {
+    font-size: 24px;
+  }
+}
+
+.button {
+  @include buttonPrimary;
+}
+
+.button-secondary {
+  font-family: 'Proxima';
+  cursor: pointer;
+  @include buttonSecondary;
+}
+
+.myBox {
+  border: none;
+  padding: 5px;
+  font-family: 'Proxima';
+  width: 300px;
+  height: 220px;
+  overflow: scroll;
+  overflow-x: hidden;
+}
+
+.myRecordScrollBox {
+  border: none;
+  padding: 5px;
+  font-family: 'Proxima';
+  width: 300px;
+  height: 220px;
+  align-self: center;
+}
+
+.marquee {
+  height: 100%;
+}
+
+.marqueeText {
+  margin-top: 10%;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  border: 1px solid #333e5b;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333e5b;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #333e5b;
+}
+.para2 {
+  font-weight: bold;
+  // font-style: italic;
+  margin-bottom: 1rem;
+  text-align: center;
+}

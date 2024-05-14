@@ -1,0 +1,20 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-brainintelproject-dev-50421-authRole",
+      "UnauthRoleArn": "arn:aws:iam::260467346373:role/amplify-brainintelproject-dev-50421-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::260467346373:role/amplify-brainintelproject-dev-50421-authRole",
+      "Region": "ap-south-1",
+      "DeploymentBucketName": "amplify-brainintelproject-dev-50421-deployment",
+      "UnauthRoleName": "amplify-brainintelproject-dev-50421-unauthRole",
+      "StackName": "amplify-brainintelproject-dev-50421",
+      "StackId": "arn:aws:cloudformation:ap-south-1:260467346373:stack/amplify-brainintelproject-dev-50421/9c2092a0-10ff-11ef-8ea9-06f6c0cda6be",
+      "AmplifyAppId": "d1oh5dla7p3btv"
+    },
+    "categories": {
+      "auth": {
+        "brainintelproject7ae96eea": {}
+      }
+    }
+  }
+}

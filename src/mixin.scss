@@ -1,0 +1,24 @@
+@mixin buttonPrimary {
+    height: 40px;
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 6px 30px;
+    letter-spacing: 1px;
+    background:#333E5B;
+    border: 0;
+    border-radius: 2px;
+ 
+}
+
+@mixin buttonSecondary {
+    color: #333E5B;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 6px 30px;
+    letter-spacing: 1px;
+    background:#FFFFFF;
+    border: 1px solid #333E5B;
+    border-radius: 2px;
+    height: 40px
+}

@@ -1,0 +1,29 @@
+.headingBrain {
+  font-family: 'Proxima';
+  margin-left: 1.45rem;
+  position: relative;
+  color: #333e5b;
+  margin-bottom: 5px; /* Adjust this value to reduce the gap */
+}
+
+.appAside {
+  height: 100vh;
+  background-image: url('../../images/Login-image.svg');
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+.citeline-logo {
+  height: 40px;
+  position: relative;
+  top: 29px;
+  left: 40px;
+  font-family: 'Proxima';
+}
+
+.app-tagline {
+  color: #333e5b;
+  font-family: 'Proxima';
+  font-size: 30px;
+  opacity: 50%;
+}
