@@ -26,8 +26,8 @@ const InstructionPage = (props) => {
  
   
   React.useEffect(() => {
-  
-    setEmail('');
+    const username= JSON.parse(localStorage.getItem('registration'));
+    setEmail(username);
     setPassword('');
   
   }, []);
@@ -45,7 +45,7 @@ const InstructionPage = (props) => {
     }
    
 
-
+    
     return(
         <Grid xs={12} sm={6} >
             <Typography >
@@ -63,14 +63,13 @@ const InstructionPage = (props) => {
 
             </Typography> 
 
-            <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
+            <Typography sx={{ justifyContent: 'center', display: 'none' }} mt={2}>
         <StyledInput
           id="outlined-basic"
           label="Email"
           variant="outlined"
-          onChange={(ev) => setEmail(ev.target.value)}
-          value={email}
-          required
+          value="" 
+          disabled
         />
       </Typography>
 
@@ -94,6 +93,7 @@ const InstructionPage = (props) => {
             <PrimaryButton
               variant="contained"
               className=""
+              
               onClick={verifyEmailOTP}
             
             >
