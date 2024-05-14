@@ -130,6 +130,10 @@ const Registration = (props) => {
     setModalShow(true);
   };
 
+  React.useEffect(() => {
+    localStorage.setItem('registration', JSON.stringify(email));
+  }, [email]);
+
   return (
     <Grid xs={12} sm={6}>
       <Typography>
