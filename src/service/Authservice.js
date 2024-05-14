@@ -31,7 +31,7 @@ export const login = async (username, password) => {
   );
   */
 
-  debugger;
+ 
 
   const response = await signIn({ username: username, password: password});
   console.log(response);
@@ -51,7 +51,14 @@ export const login = async (username, password) => {
     // }
 
     result = username;
+    if(response.isSignedIn){
+      const userObject = { userId: username, userInfo: "" };
+      localStorage.setItem('userObject', JSON.stringify(userObject));
+
+    }
   } else {
+    const userObject = { userId: "", userInfo: "" };
+    localStorage.setItem('userObject', JSON.stringify(userObject));
     result = 'Invalid username and password';
   }
 
@@ -59,7 +66,6 @@ export const login = async (username, password) => {
 };
 
 export const verifyEmail = async (email, verificationCode) => {
-  debugger;
   const response =await confirmSignUp({
     username: email,
     confirmationCode: verificationCode
@@ -91,7 +97,6 @@ export const register = async (email, firstName, lastName, password) => {
     }
 });
   
-debugger;
 
   
   
@@ -145,18 +150,14 @@ export const forgotPassowrd = async (email) => {
     }
   );
   */
-  debugger;
   const response = await resetPassword({ email });
   forgotPassowrdResponse =handleResetPasswordNextSteps(response);
-
-  debugger;
   return forgotPassowrdResponse;
 };
 
 function handleResetPasswordNextSteps(output) {
   const { nextStep } = output;
   let forgotPassowrdResponse1;
-  debugger;
   switch (nextStep.resetPasswordStep) {
     case 'CONFIRM_RESET_PASSWORD_WITH_CODE':
       const codeDeliveryDetails = nextStep.codeDeliveryDetails;
