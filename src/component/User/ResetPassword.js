@@ -16,6 +16,8 @@ import {resetPassword} from '../../service/Authservice';
 import {useNavigate } from 'react-router-dom';
 import {handleConfirmResetPassword} from '../../service/Authservice';
 
+import '../../index.css';
+
 
 const ResetPassword = (props) => {
 

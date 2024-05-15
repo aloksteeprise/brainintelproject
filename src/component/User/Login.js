@@ -49,6 +49,7 @@ const Login = () => {
 
   const redirectAuthenticator = async (e) => {
     e.preventDefault();
+    localStorage.setItem('login',true)
 
     try {
       setError('');

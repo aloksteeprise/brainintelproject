@@ -5,7 +5,7 @@ import { fetchAuthSession, getCurrentUser, signIn, signOut, verifyTOTPSetup, sig
 import { Amplify } from 'aws-amplify';
 import awsconfig from '../aws-exports';
 import {withAuthenticator } from '@aws-amplify/ui-react'
-import { confirmResetPassword } from 'aws-amplify/auth';
+import { confirmResetPassword ,resendSignUpCode} from 'aws-amplify/auth';
 
 import { resetPassword as awsResetPassword  } from 'aws-amplify/auth';
 Amplify.configure(awsconfig);
@@ -66,12 +66,24 @@ export const login = async (username, password) => {
 };
 
 export const verifyEmail = async (email, verificationCode) => {
+
+  debugger
   const response =await confirmSignUp({
     username: email,
     confirmationCode: verificationCode
   });
   return response;
 };
+
+// export const resendSignUp = async (username) => {
+//   try {
+//     debugger;
+//     await resendSignUpCode({email: username});
+//     console.log('Confirmation code resent successfully'); 
+//   } catch (error) {
+//     console.error('Error resending confirmation code:', error);
+//   }
+// };
 
 // Define the handleConfirmResetPassword function
 

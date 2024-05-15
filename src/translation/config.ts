@@ -22,6 +22,7 @@ const config = {
   resetPasswordContinued:
     'us. You will receive a link to create a new password via email.',
   resetButton: 'Reset',
+  resendOtp:'Resend OTP',
   resetBack: 'Back to login',
   instructions: 'Instructions have been sent',
   instrcutionsNote:
