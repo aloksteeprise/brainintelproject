@@ -6,7 +6,7 @@ const HeaderLogin = () => {
   return (
     <div style={{ position: 'relative', textAlign: 'center' }}>
       <img
-        src={companyLogo}
+        src="https://amplify-brainintelproject-dev-50421-deployment.s3.ap-south-1.amazonaws.com/companyLogo.jpeg"
         alt="Company Logo"
         style={{
           width: '100px',
