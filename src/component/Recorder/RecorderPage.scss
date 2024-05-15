@@ -59,6 +59,15 @@
   margin: 0 auto;
   display: block;
 }
+.custLabel{
+  color: blue;
+  text-decoration: underline;
+}
+
+.custLabel:hover{
+  color: rgb(61, 61, 68);
+  text-decoration: underline;
+}
 
 @media (max-width: 992px) {
   .first {

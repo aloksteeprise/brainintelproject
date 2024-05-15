@@ -263,6 +263,7 @@ function RecorderPage() {
   };
 
   const [result, setResult] = useState([]);
+  const [s3Files, s3SetFiles] = useState([]);
   const checkResults = () => {
     debugger;
     const userInfo = getUserInfo();
@@ -282,7 +283,7 @@ function RecorderPage() {
           // if (val.Key.includes('.pdf')) {
           //   r.push(val.Key);
           // }
-          if (val) {
+          if (val.Key) {
             r.push(val.Key);
           }
         });
@@ -324,22 +325,20 @@ function RecorderPage() {
   };
 
   const onButtonClick = (key) => {
-    s3.getObject({ Key: key }, function (err, data) {
+    debugger;
+    // Parameters for downloading object
+    const params = {
+      Bucket: albumBucketName,
+      Key: key,
+    };
+
+    // Generate a pre-signed URL for the object
+    s3.getSignedUrl('getObject', params, (err, url) => {
       if (err) {
-        return alert('There was an error viewing your album: ' + err.message);
+        console.error('Error', err);
       } else {
-        var blobStore = new Blob([data.Body], { type: 'application/pdf' });
-        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-          window.navigator.msSaveOrOpenBlob(blobStore);
-          return;
-        }
-        var data = window.URL.createObjectURL(blobStore);
-        var link = document.createElement('a');
-        document.body.appendChild(link);
-        link.href = data;
-        link.download = key + '.pdf';
-        link.click();
-        window.URL.revokeObjectURL(data);
+        // Download the object using the generated URL
+        window.open(url, '_blank');
       }
     });
   };
@@ -493,16 +492,16 @@ function RecorderPage() {
                   return (
                     <p>
                       {' '}
-                      {/* Here is the link to */}
-                      <a
-                        href={r}
+                      Here is the link to
+                      <label className="custLabel"
                         onClick={() => {
                           onButtonClick(r);
-                        }}
+                        }
+                      }
                       >
                         {' '}
                         {r}
-                      </a>
+                      </label>
                     </p>
                   );
                 })}
