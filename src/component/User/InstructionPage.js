@@ -39,12 +39,12 @@ const InstructionPage = (props) => {
     ev.preventDefault();
     try {
       if (!password) {
-        setErrorMsg('Password must be at least 6 characters long.');
+        setErrorMsg('OTP cannot be null');
         return;
       }
   
       if (password.length !== 6) {
-        setErrorMsg('Password must be exactly 6 characters long.');
+        setErrorMsg('OTP must be exactly 6 characters long.');
         return;
       }
       setErrorMsg('');
