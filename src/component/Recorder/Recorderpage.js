@@ -7,11 +7,13 @@ import { useEffect, useState } from 'react';
 import AWS from 'aws-sdk';
 import Header from '../Header/Header';
 import Footer from './Footer.js';
+import jsPDF from 'jspdf';
 
 let mediaRecorder;
 let audioCtx;
 
 function RecorderPage() {
+
   const [state, setState] = useState({
     startAnalysis: true,
     recording: false,
@@ -177,6 +179,7 @@ function RecorderPage() {
         console.log(err, err.stack);
       } else {
         console.log('success');
+        createPdf(folderName,name)
       }
     });
     setState((state) => ({
@@ -186,6 +189,37 @@ function RecorderPage() {
     }));
   };
 
+  const createPdf = (folderName,name) => {
+    debugger;
+    const userInfo = getUserInfo();
+    let id = userInfo?.userId;
+    const doc = new jsPDF();
+    doc.text(`Hello ${id}`, 10, 10);
+    doc.text('This is a sample PDF file.', 10, 20);
+
+    // Save the PDF
+    const pdfBlob = doc.output('blob');
+    var params = {
+      // Body: state.audioFile,
+      Bucket: albumBucketName,
+      Key: `${folderName}/${name + '.pdf'}`,
+      // Key: name + '.wav',
+      Body: pdfBlob,
+      ContentType: 'application/pdf',
+    };
+    s3.putObject(params, function (err, data) {
+      if (err) {
+        console.log(err, err.stack);
+      } else {
+        console.log('success');
+      }
+    });
+    setState((state) => ({
+      ...state,
+      completed: false,
+      submitted: true,
+    }));
+  };
   const getUserInfo = () => {
     return JSON.parse(localStorage.getItem('userObject'));
   };
@@ -230,9 +264,11 @@ function RecorderPage() {
 
   const [result, setResult] = useState([]);
   const checkResults = () => {
+    debugger;
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
-    s3.listObjects({ Prefix: id }, function (err, data) {
+    const folderName = getUserFolderName();
+    s3.listObjects({ Prefix: folderName }, function (err, data) {
       if (err) {
         return alert(
           'There was a brutal error viewing your album: ' + err.message
@@ -243,7 +279,10 @@ function RecorderPage() {
 
         let r = [];
         data.Contents.map((val) => {
-          if (val.Key.includes('.pdf')) {
+          // if (val.Key.includes('.pdf')) {
+          //   r.push(val.Key);
+          // }
+          if (val) {
             r.push(val.Key);
           }
         });
@@ -454,7 +493,7 @@ function RecorderPage() {
                   return (
                     <p>
                       {' '}
-                      Here is the link to
+                      {/* Here is the link to */}
                       <a
                         href={r}
                         onClick={() => {
