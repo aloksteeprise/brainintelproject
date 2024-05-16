@@ -17,10 +17,9 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import PrimaryButton from '../../layout/Buton/PrimaryButton';
 import StyledInput from '../../layout/TextInput';
 import config from '../../translation/config';
-import { login } from '../../service/Authservice';
+import { login,handleSignOut } from '../../service/Authservice';
 import {withAuthenticator } from '@aws-amplify/ui-react';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
-
 
 
 import './Login.scss';
@@ -35,6 +34,7 @@ const Login = () => {
 
 
   localStorage.clear();
+  handleSignOut();
   React.useEffect(() => {
     setError(false);
   }, []);

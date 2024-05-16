@@ -301,6 +301,11 @@ function RecorderPage() {
     setState((state) => ({ ...state, view: false, startAnalysis: true }));
   };
 
+
+  const backtoStartFromRecord = () => {
+    setState((state) => ({ ...state, view: false, startAnalysis: true,record:false }));
+  };
+
   useEffect(() => {
     if (state.recording) {
       startRecording();
@@ -322,6 +327,11 @@ function RecorderPage() {
     if (mediaRecorder && state.recording) {
       mediaRecorder.stop();
     }
+    setState((state) => ({
+      ...state,
+      startAnalysis: false,
+      record: false,
+    }));
   };
 
   const onButtonClick = (key) => {
@@ -429,7 +439,12 @@ function RecorderPage() {
                 >
                   Record
                 </button>
+                
               )}
+              <button className="button" onClick={backtoStartFromRecord}>
+                {' '}
+                Close
+              </button>
             </div>
           </div>
         </div>

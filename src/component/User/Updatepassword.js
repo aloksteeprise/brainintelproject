@@ -85,6 +85,7 @@ const UpdatePassword = (props) => {
             if (response === true) {
                 setMessage(response);
                 handleSignOut();
+                localStorage.clear('');
             }
             // setSnackbarOpen(true);
             setPassword("")
