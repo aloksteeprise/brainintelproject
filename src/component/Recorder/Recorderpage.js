@@ -244,11 +244,17 @@ function RecorderPage() {
     let hh = today.getHours();
     let mins = today.getMinutes();
     let secs = today.getSeconds();
+    debugger;
 
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
+    if (hh < 10) hh = '0' + hh;
+    if (mins < 10) mins = '0' + mins;
+    if (secs < 10) secs = '0' + secs;
 
+let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
     // return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
+
     return "BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
   };
 
