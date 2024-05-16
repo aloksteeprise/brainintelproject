@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PersonIcon from '@mui/icons-material/Person';
 import './Header.scss';
 
@@ -52,8 +53,16 @@ const Header = () => {
       </div>
       <div id="modal" className={open ? 'open' : ''}>
         <div className="container">
-          <div className="user-text">{user?.name}</div>
-          <div className="user-text">{user?.userId}</div>
+          {/* <div className="user-text">{user?.name}</div> */}
+          <button className="logout-button" disabled>
+            <PersonIcon />
+            &nbsp;&nbsp;<span>{user?.name}</span>
+          </button>
+          <button className="logout-button" disabled>
+            <MailOutlineIcon />
+            &nbsp;&nbsp;<span>{user?.userId}</span>
+          </button>
+          {/* <div className="user-text"> <MailOutlineIcon /> <span>{user?.userId}</span></div> */}
           <button className="logout-button" onClick={() => onCloseHandler()}>
             <LogoutIcon />
             &nbsp;&nbsp;<span>Log out</span>

@@ -18,7 +18,8 @@ import PrimaryButton from '../../layout/Buton/PrimaryButton';
 import StyledInput from '../../layout/TextInput';
 import config from '../../translation/config';
 import { login } from '../../service/Authservice';
-import {withAuthenticator } from '@aws-amplify/ui-react'
+import {withAuthenticator } from '@aws-amplify/ui-react';
+import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
 import './Login.scss';
 
@@ -97,6 +98,7 @@ const Login = () => {
                   endAdornment: <InputAdornment />,
                 }}
               />
+             
             </Typography>
             <Typography
               mt={2}
@@ -133,7 +135,7 @@ const Login = () => {
               mt={2}
               sx={{ display: 'flex', justifyContent: 'space-evenly' }}
             >
-              <a
+             <a
                 href="#"
                 onClick={redirectForgot}
                 style={{ position: 'relative', right: '8px' }}

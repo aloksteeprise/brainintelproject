@@ -230,7 +230,7 @@ const Registration = (props) => {
 
       <Typography mt={2} sx={{ justifyContent: 'center', display: 'flex' }}>
         <StyledInput
-          id="outlined-basic-password"
+          id="outlined-basic-password1"
           label="Password"
           variant="outlined"
           type={showPassword ? 'text' : 'password'}
