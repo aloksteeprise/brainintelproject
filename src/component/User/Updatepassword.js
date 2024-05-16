@@ -48,33 +48,6 @@ const UpdatePassword = (props) => {
         navigate('/record');
     }
 
-
-    // const checkValidation=()=> {
-    //     if(password !== confirmpassword){
-    //         setErrorMsg('Both the passowrds dont match')
-    //     }
-    //     else if(password.length ===0 || confirmpassword.length === 0)
-    //     {
-    //         setErrorMsg('Please fill in both the fields');
-    //     }
-    //     else {
-    //         resetPassword(token, confirmpassword);
-    //         navigate('/login');
-    //     }
-    // }
-
-    // const resetPasswordAPI= () => {
-
-    //     try {
-    //        checkValidation();
-    //     }
-    //     catch(err) {
-    //         console.error('err', err);
-    //     }    
-    // }
-
-    const username = JSON.parse(localStorage.getItem('items'));
-
     const updatePassword = async (ev) => {
         ev.preventDefault();
         debugger;
@@ -82,16 +55,20 @@ const UpdatePassword = (props) => {
         try {
             debugger;
             const response = await handleUpdatePassword(password, newpassword);
+            setPassword("")
+            setNewPassword("")
             if (response === true) {
                 setMessage(response);
                 handleSignOut();
                 localStorage.clear('');
             }
+            else {
+                setErrorMsg("Incorrect Old password")
+            }
             // setSnackbarOpen(true);
-            setPassword("")
-            setNewPassword("")
-        }
 
+
+        }
 
         catch (err) {
             console.log('thes are the errors', err);
@@ -121,12 +98,12 @@ const UpdatePassword = (props) => {
                     <Typography mt={6}>
                         <p className='subheading'>{config.resetHeading}</p>
                     </Typography>
-                    {
+                    {/* {
                         errorMsg.length > 0 ?
                             <Typography mt={2}>
                                 <p style={{ fontSize: 'small', color: 'red', justifyContent: 'center', display: 'flex' }}>{errorMsg}</p>
                             </Typography> : null
-                    }
+                    } */}
 
                     <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
                         <StyledInput id="outlined-basic" label="Old Password" variant="outlined" onChange={(ev) => setPassword(ev.target.value)}
@@ -155,47 +132,50 @@ const UpdatePassword = (props) => {
                             }}
                             required />
                     </Typography>
+                    <Typography className="error-message" color="error" mt={2} sx={{ justifyContent: 'center', display: 'flex' }}>
+                        {errorMsg}
+                    </Typography>
                     {!messages && (
-                    <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={6}>
+                        <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={6}>
 
-                        <Button variant='oulined' startIcon={<ArrowBack />} color="#333E5B" style={{ marginRight: '150px' }}
-                            onClick={backtoLogin}>Back
-                        </Button>
-                        <PrimaryButton variant='contained' className='buttonPrimarylogin' onClick={updatePassword}
-                        >{config.updatepassword}
+                            <Button variant='oulined' startIcon={<ArrowBack />} color="#333E5B" style={{ marginRight: '150px' }}
+                                onClick={backtoLogin}>Back
+                            </Button>
+                            <PrimaryButton variant='contained' className='buttonPrimarylogin' onClick={updatePassword}
+                            >{config.updatepassword}
 
-                        </PrimaryButton>
+                            </PrimaryButton>
                         </Typography>
                     )}
-                        {messages && (
-                            <Grid>
-                                <Typography
-                                    className="button-container"
-                                    mt={2}
-                                    sx={{ display: 'flex', justifyContent: 'space-evenly' }}
+                    {messages && (
+                        <Grid>
+                            <Typography
+                                className="button-container"
+                                mt={2}
+                                sx={{ display: 'flex', justifyContent: 'space-evenly' }}
+                            >
+                                {config.updatePassword}
+
+                            </Typography>
+                            <Typography
+                                className="button-container"
+                                mt={2}
+                                sx={{ display: 'flex', justifyContent: 'space-evenly' }}
+                            >
+
+                                <a
+                                    href="#"
+                                    onClick={handleLogout}
+                                    style={{ position: 'relative', right: '8px' }}
                                 >
-                                    {config.updatePassword}
-
-                                </Typography>
-                                <Typography
-                                    className="button-container"
-                                    mt={2}
-                                    sx={{ display: 'flex', justifyContent: 'space-evenly' }}
-                                >
-
-                                    <a
-                                        href="#"
-                                        onClick={handleLogout}
-                                        style={{ position: 'relative', right: '8px' }}
-                                    >
-                                        {config.onupdatePasswordLogin}
-                                    </a>
-                                </Typography>
-                            </Grid>
-                        )}
+                                    {config.onupdatePasswordLogin}
+                                </a>
+                            </Typography>
+                        </Grid>
+                    )}
 
 
-                    
+
                     <Footer style='140px' />
 
                 </Grid>
