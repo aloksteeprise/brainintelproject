@@ -67,6 +67,8 @@ const config = {
   confirmationAuth:
     'Open the Microsoft Authenticator app on your smartphone and enter the one-time password code',
   Help: 'Help',
+  updatePassword: 'Password have been updated',
+  onupdatePasswordLogin: 'Login',
 };
 
 export default config;
