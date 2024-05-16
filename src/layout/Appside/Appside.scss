@@ -13,6 +13,15 @@
   overflow: hidden;
 }
 
+@media (max-width: 480px) {
+  .appAside {
+    height: 10vh;
+    background-image: url('../../images/Login-image.svg');
+    background-repeat: no-repeat;
+    overflow: hidden;
+  }
+}
+
 .citeline-logo {
   height: 40px;
   position: relative;
