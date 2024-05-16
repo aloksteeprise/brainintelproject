@@ -243,11 +243,13 @@ function RecorderPage() {
 
     let hh = today.getHours();
     let mins = today.getMinutes();
+    let secs = today.getSeconds();
 
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
 
-    return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
+    // return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
+    return "BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
   };
 
   const closeHandler = () => {
@@ -507,7 +509,7 @@ function RecorderPage() {
                   return (
                     <p>
                       {' '}
-                      Here is the link to
+                      {/* Here is the link to */}
                       <label className="custLabel"
                         onClick={() => {
                           onButtonClick(r);
