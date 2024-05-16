@@ -7,6 +7,7 @@ const config = {
     'how the system processes your personal data, please click on our ',
   loginPrivacyPOlicy: 'Privacy Policy',
   loginAccount: "Don't have an account?",
+  updatelogin:"Go to Login",
   loginContactUS: 'Register here',
   loginForgotPassword: 'Forgot Password?',
   loginRedirect: 'Back to Login',
@@ -23,6 +24,7 @@ const config = {
     'us. You will receive a link to create a new password via email.',
   resetButton: 'Reset',
   resendOtp:'Resend OTP',
+  updatepassword:'Update Password',
   resetBack: 'Back to login',
   instructions: 'Instructions have been sent',
   instrcutionsNote:

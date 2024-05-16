@@ -4,6 +4,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 import PersonIcon from '@mui/icons-material/Person';
 import './Header.scss';
+import { handleSignOut } from '../../service/Authservice';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const Header = () => {
 
   const onCloseHandler = () => {
     navigate('/login');
+    handleSignOut();
     setOpen(false);
     // localStorage.removeItem('userObject');
     // localStorage.removeItem('user');
