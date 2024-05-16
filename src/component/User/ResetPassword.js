@@ -16,6 +16,7 @@ import {resetPassword} from '../../service/Authservice';
 import {useNavigate } from 'react-router-dom';
 import {handleConfirmResetPassword} from '../../service/Authservice';
 
+
 import '../../index.css';
 
 
@@ -31,7 +32,7 @@ const ResetPassword = (props) => {
     const [token, setToken]= React.useState('');
     const [errorMsg, setErrorMsg] = React.useState('');
     const navigate=useNavigate();
-
+    const [isChecked, setChecked] = React.useState(false);
     React.useEffect(() => {
       const urltoken=  url.split('=').pop();
       setToken(urltoken);
@@ -74,14 +75,16 @@ const ResetPassword = (props) => {
 
     const verifyEmailOTPds =  async (ev) => {   
         ev.preventDefault();
-        debugger;
+        setChecked(true);
         try{
             handleConfirmResetPassword(username,otpcode,password);
             navigate('/');
             localStorage.removeItem("items")
+            setChecked(false);
         }
         catch(err){
             console.log('thes are the errors', err);
+            setChecked(false);
         }
     }
    
@@ -152,7 +155,7 @@ return(
                     <Button variant='oulined'  startIcon={<ArrowBack/>} color="#333E5B" style={{marginRight: '150px'}}
                           onClick={backtoLogin}>Back
                         </Button>
-                        <PrimaryButton variant='contained' className='buttonPrimarylogin' onClick={verifyEmailOTPds}
+                        <PrimaryButton variant='contained' className='buttonPrimarylogin' disabled={isChecked} onClick={verifyEmailOTPds}
                             >{config.resetButton}
                         </PrimaryButton>
                     </Typography>  
