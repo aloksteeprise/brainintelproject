@@ -53,14 +53,14 @@ const ForgotPassword= (props) => {
 
       const checkValidation =async() => {
 
-        debugger;
+      
         if(email.length === 0  ){
             
             setIsRequiredmsg(true);
         }
         
         else if(!(validateEmail(email))) {
-            debugger;
+           
             setErrorMailMessage('Invalid email');
             setIsRequiredmsg(false);
 
@@ -77,19 +77,26 @@ const ForgotPassword= (props) => {
             //setErrorMailMessage('');
             setSignupErrormsgShow(false)
             const forgotPasswordResult= await resetPassword(email);
-            navigate('/reset')
-            if(forgotPasswordResult!== 'success'){
-                // setErrorMailMessage(forgotPasswordResult);
+            
+            let isResult='0';
+            let isResultMessage='';
+            if(forgotPasswordResult){
+                isResult = forgotPasswordResult.split('-')[0];
+                isResultMessage = forgotPasswordResult.split('-')[1];
+              }
+            if(isResult== '0'){
+                setErrorMailMessage(isResultMessage);
             }
             else {
                 setErrorMailMessage('')
-                setPage('link')
+                //setPage('link')
+                navigate('/reset');
             }
         }
       }
     
     const forgotPassword = async(ev) => {
-        debugger;
+        
         ev.preventDefault();
         try{
             checkValidation();

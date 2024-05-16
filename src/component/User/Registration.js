@@ -104,6 +104,7 @@ const Registration = (props) => {
   /* registration*/
   const signUp = async (ev) => {
     ev.preventDefault();
+    
     try {
       checkValidation();
       await register(email, firstName, lastName, password);
@@ -115,7 +116,8 @@ const Registration = (props) => {
       
     } catch (err) {
       console.error('error', err);
-      setSignupErrormsg(err.response.data.message);
+      setSignupErrormsgShow(true);
+      setSignupErrormsg(err.message);
     }
   };
 

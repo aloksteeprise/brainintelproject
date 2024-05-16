@@ -68,7 +68,8 @@ const Login = () => {
       if (username.length === 0 || password.length === 0) {
         setError('Please fill in both the fields');
       } else {
-        setError('Invalid Credentials');
+        setError(error.message);
+        // setError('Invalid Credentials');
       }
 
       console.error('error', error);

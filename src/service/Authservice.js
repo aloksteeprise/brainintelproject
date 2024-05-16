@@ -67,7 +67,7 @@ export const login = async (username, password) => {
 
 export const verifyEmail = async (email, verificationCode) => {
 
-  debugger
+  
   const response =await confirmSignUp({
     username: email,
     confirmationCode: verificationCode
@@ -77,7 +77,7 @@ export const verifyEmail = async (email, verificationCode) => {
 
 export const resendSignUp = async (username) => {
   try {
-    debugger;
+   
     await resendSignUpCode({email: username});
     console.log('Confirmation code resent successfully'); 
   } catch (error) {
@@ -89,7 +89,7 @@ export const resendSignUp = async (username) => {
 
 export const handleConfirmResetPassword = async ( username,confirmationCode,  newPassword ) => {
   try {
-    debugger;
+    
     await confirmResetPassword({username,confirmationCode,  newPassword });
   } catch (error) {
     console.log(error);
@@ -98,7 +98,7 @@ export const handleConfirmResetPassword = async ( username,confirmationCode,  ne
 
 export const handleUpdatePassword = async  (oldPassword, newPassword) =>{
   try {
-    debugger;
+    
     await updatePassword({ oldPassword, newPassword });
     return true;
 
@@ -152,13 +152,25 @@ export const register = async (email, firstName, lastName, password) => {
 
 
 export const resetPassword = async function handleResetPassword(username) {
+  let responseMesage='';
   try {
-    debugger;
+   
+   
     const output = await awsResetPassword({ username });
-    handleResetPasswordNextSteps(output);
+   const message= handleResetPasswordNextSteps(output);
+   responseMesage = '1'+'-'+message;
   } catch (error) {
+
+    if(error.name)
+      {
+        //responseMesage= error.message;
+        responseMesage = '0'+'-'+error.message;
+      }
+      
+    
     console.log(error);
   }
+  return responseMesage;
 };
 
 
@@ -180,6 +192,7 @@ export const forgotPassowrd = async (email) => {
 };
 
 function handleResetPasswordNextSteps(output) {
+  
   const { nextStep } = output;
   let forgotPassowrdResponse1;
   switch (nextStep.resetPasswordStep) {
