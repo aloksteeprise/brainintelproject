@@ -5,10 +5,10 @@ import { fetchAuthSession, getCurrentUser, signIn, signOut, verifyTOTPSetup, sig
 import { Amplify } from 'aws-amplify';
 import awsconfig from '../aws-exports';
 import {withAuthenticator } from '@aws-amplify/ui-react'
-import { confirmResetPassword ,resendSignUpCode} from 'aws-amplify/auth';
+import { confirmResetPassword ,resendSignUpCode,updatePassword } from 'aws-amplify/auth';
 
 import { resetPassword as awsResetPassword  } from 'aws-amplify/auth';
-Amplify.configure(awsconfig);
+Amplify.configure(awsconfig, {ssr: true})
 
 function decodeJWT(token) {
   if (!token) return;
@@ -75,15 +75,15 @@ export const verifyEmail = async (email, verificationCode) => {
   return response;
 };
 
-// export const resendSignUp = async (username) => {
-//   try {
-//     debugger;
-//     await resendSignUpCode({email: username});
-//     console.log('Confirmation code resent successfully'); 
-//   } catch (error) {
-//     console.error('Error resending confirmation code:', error);
-//   }
-// };
+export const resendSignUp = async (username) => {
+  try {
+    debugger;
+    await resendSignUpCode({email: username});
+    console.log('Confirmation code resent successfully'); 
+  } catch (error) {
+    console.error('Error resending confirmation code:', error);
+  }
+};
 
 // Define the handleConfirmResetPassword function
 
@@ -95,6 +95,18 @@ export const handleConfirmResetPassword = async ( username,confirmationCode,  ne
     console.log(error);
   }
 };
+
+export const handleUpdatePassword = async  (oldPassword, newPassword) =>{
+  try {
+    debugger;
+    await updatePassword({ oldPassword, newPassword });
+    return true;
+
+  } catch (err) {
+    console.log(err);
+    return false
+  }
+}
 
 
 export const register = async (email, firstName, lastName, password) => {
@@ -204,3 +216,11 @@ export const isAuthenticated = () => {
   }
   return user;
 };
+
+export const handleSignOut = async () => {
+  try {
+     await signOut();
+  } catch (error) {
+    console.log('error signing out: ', error);
+  }
+}

@@ -8,6 +8,7 @@ import ResetPassword from './component/User/ResetPassword';
 import EmailVerification from './component/User/EmailVerification';
 import InstructionPage from  './component/User/InstructionPage'
 import Protected from './service/isAuth';
+import UpdatePassword from './component/User/Updatepassword';
 
 const MainRoutes = () => {
   return (
@@ -17,7 +18,9 @@ const MainRoutes = () => {
       <Route path="/reset" element={<ResetPassword />} />
       <Route path="/verifyEmail" element={<EmailVerification />} />
       <Route path="/Instruction" element={<InstructionPage />} />
-      <Route path="/record" element={<Protected Component={RecorderPage} />} />
+      <Route path="/record" element={<RecorderPage/>}/>
+      {/* <Route path="/record" element={<Protected Component={RecorderPage} />} /> */}
+      <Route path="/update" element={<UpdatePassword />} />
     </Routes>
   );
 };
