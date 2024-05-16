@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PersonIcon from '@mui/icons-material/Person';
 import './Header.scss';
 
 const Header = () => {
@@ -25,8 +26,12 @@ const Header = () => {
   useEffect(() => {
     if (currentUser) {
       let u = JSON.parse(currentUser);
-      if (u.userInfo) {
-        let name = u.userInfo.split('@')[0];
+      // if (u.userInfo) {
+      //   let name = u.userInfo.split('@')[0];
+      //   setUser({ ...u, name: name });
+      // }
+      if (u.userId) {
+        let name = u.userId.split('@')[0];
         setUser({ ...u, name: name });
       }
     }
