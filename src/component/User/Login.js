@@ -111,7 +111,7 @@ const Login = () => {
                 onChange={(ev) => setUserName(ev.target.value)}
                 onKeyDown={handleKeyDown}
                 InputProps={{
-                  endAdornment: <InputAdornment />,
+                  endAdornment: <InputAdornment />
                 }}
               />
              
@@ -136,6 +136,9 @@ const Login = () => {
                       )}
                     </InputAdornment>
                   ),
+                  inputProps: {
+                    maxLength: config.passwordmaxlenght
+                  }
                 }}
                 onChange={(ev) => setpassword(ev.target.value)}
                 value={password}
