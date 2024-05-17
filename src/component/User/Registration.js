@@ -117,7 +117,12 @@ const Registration = (props) => {
     } catch (err) {
       console.error('error', err);
       setSignupErrormsgShow(true);
-      setSignupErrormsg(err.message);
+      if (password.length <= 8 ){
+        setSignupErrormsg("Password must be minimum 8 character");
+      }
+      else{
+        setSignupErrormsg(err.message);
+      }
     }
   };
 
