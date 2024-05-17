@@ -63,7 +63,7 @@ const UpdatePassword = (props) => {
                 handleSignOut();
                 setErrorMsg("")
                 localStorage.clear('');
-                setErrorMsg("")
+                
             }
             else {
                 setErrorMsg("Incorrect Old password");
