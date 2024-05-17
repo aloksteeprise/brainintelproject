@@ -97,14 +97,17 @@ export const handleConfirmResetPassword = async ( username,confirmationCode,  ne
 };
 
 export const handleUpdatePassword = async  (oldPassword, newPassword) =>{
+  debugger;
+  let isPasswordChangeDone ='';
   try {
     
-    await updatePassword({ oldPassword, newPassword });
-    return true;
+    const result =  await updatePassword({ oldPassword, newPassword });
+    isPasswordChangeDone = '1-'+ '' + result;
+    return isPasswordChangeDone;
 
   } catch (err) {
-    console.log(err);
-    return false
+    isPasswordChangeDone = '0-'+ '' + err.message;
+    return isPasswordChangeDone;
   }
 }
 

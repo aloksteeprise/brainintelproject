@@ -51,23 +51,32 @@ const UpdatePassword = (props) => {
     const updatePassword = async (ev) => {
         ev.preventDefault();
         debugger;
-
+        if(newpassword.length<8){
+            setErrorMsg("Password must be minimum 8 character");
+            return false;
+        }
         try {
             debugger;
             const response = await handleUpdatePassword(password, newpassword);
-            setPassword("")
-            setNewPassword("")
-            debugger;
-            if (response === true) {
+            let isResult='0';
+            let isResultMessage='';
+            if(response){
+                isResult = response.split('-')[0];
+                isResultMessage = response.split('-')[1];
+              }
+              if(isResult=='1'){
+
+                setPassword("")
+                setNewPassword("")
                 setMessage(response);
                 handleSignOut();
                 setErrorMsg("")
                 localStorage.clear('');
-                
+              }
+            else{
+                setErrorMsg(isResultMessage);
             }
-            else {
-                setErrorMsg("Incorrect Old password");
-            }
+         
             // setSnackbarOpen(true);
 
 
