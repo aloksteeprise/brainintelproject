@@ -307,7 +307,7 @@ const Registration = (props) => {
           X
         </div>
         <Document
-          file={Pdf}
+          file='https://amplify-brainintelproject-dev-50421-deployment.s3.ap-south-1.amazonaws.com/ConsentFormat.pdf'
           onLoadSuccess={onDocumentLoadSuccess}
           onLoadError={console.error}
         >
