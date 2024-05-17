@@ -66,7 +66,12 @@ const InstructionPage = (props) => {
     
   // }
   
-
+  const handleKeyDown = (event) => {
+    if(event.keyCode==32){
+      event.preventDefault();
+    }
+    
+};
 
 
   return (
@@ -102,6 +107,7 @@ const InstructionPage = (props) => {
           label="OTP"
           variant="outlined"
           type="text"
+          onKeyDown={handleKeyDown}
           onChange={(ev) => setPassword(ev.target.value)}
           value={password}
           required

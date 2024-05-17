@@ -68,7 +68,7 @@ const Registration = (props) => {
     setErrorMailMessage('');
     setSignupErrormsg('');
     setSignupErrormsgShow('');
-    
+
   }, []);
   const validateEmail = (email) => {
     return String(email)
@@ -112,7 +112,7 @@ const Registration = (props) => {
       //setPage('link');
 
       navigate('/Instruction');
-      
+
     } catch (err) {
       console.error('error', err);
       setSignupErrormsg(err.response.data.message);
@@ -134,6 +134,13 @@ const Registration = (props) => {
   React.useEffect(() => {
     localStorage.setItem('registration', JSON.stringify(email));
   }, [email]);
+
+  const handleKeyDown = (event) => {
+    if(event.keyCode==32){
+      event.preventDefault();
+    }
+    
+};
 
   return (
     <Grid xs={12} sm={6}>
@@ -178,6 +185,7 @@ const Registration = (props) => {
           id="outlined-basic"
           label="First Name"
           variant="outlined"
+          onKeyDown={handleKeyDown}
           onChange={(ev) => setFirstName(ev.target.value)}
           value={firstName}
           required
@@ -188,6 +196,7 @@ const Registration = (props) => {
           id="outlined-basic"
           label="Last Name"
           variant="outlined"
+          onKeyDown={handleKeyDown}
           onChange={(ev) => setLastName(ev.target.value)}
           value={lastName}
           required
@@ -213,6 +222,7 @@ const Registration = (props) => {
           label="Email"
           variant="outlined"
           onChange={(ev) => setEmail(ev.target.value)}
+          onKeyDown={handleKeyDown}
           value={email}
           required
         />
@@ -234,6 +244,7 @@ const Registration = (props) => {
           id="outlined-basic-password1"
           label="Password"
           variant="outlined"
+          onKeyDown={handleKeyDown}
           type={showPassword ? 'text' : 'password'}
           InputProps={{
             endAdornment: (
@@ -245,6 +256,9 @@ const Registration = (props) => {
                 )}
               </InputAdornment>
             ),
+            inputProps: {
+              maxLength: config.passwordmaxlenght
+            }
           }}
           onChange={(ev) => setpassword(ev.target.value)}
           value={password}
@@ -252,6 +266,7 @@ const Registration = (props) => {
         />
       </Typography>
 
+      
       <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
         <div className="tacbox">
           <input

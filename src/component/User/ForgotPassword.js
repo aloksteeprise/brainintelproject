@@ -104,6 +104,12 @@ const ForgotPassword= (props) => {
     const backtoLogin = () => {
        setPage('login')
     }
+    const handleKeyDown = (event) => {
+        if(event.keyCode==32){
+          event.preventDefault();
+        }
+        
+    };
 
     return(
         <Grid xs={12} sm={6} >
@@ -130,7 +136,7 @@ const ForgotPassword= (props) => {
                 
             }
             <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>    
-                <StyledInput id="outlined-basic" label="Email" variant="outlined" onChange={(ev) => setEmail(ev.target.value)} 
+                <StyledInput id="outlined-basic" label="Email" variant="outlined"    onKeyDown={handleKeyDown} onChange={(ev) => setEmail(ev.target.value)} 
                             value={email}   style={{width:'315px'}} required/>        
             </Typography>
             <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>

@@ -60,6 +60,7 @@ const UpdatePassword = (props) => {
             if (response === true) {
                 setMessage(response);
                 handleSignOut();
+                setErrorMsg("")
             }
             else {
                 setErrorMsg("Incorrect Old password")
@@ -80,6 +81,12 @@ const UpdatePassword = (props) => {
     const handleLogout = () => {
         handleSignOut();
         navigate('/login');
+    };
+    const handleKeyDown = (event) => {
+        if(event.keyCode==32){
+          event.preventDefault();
+        }
+        
     };
 
     return (
@@ -105,20 +112,23 @@ const UpdatePassword = (props) => {
                     } */}
 
                     <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
-                        <StyledInput id="outlined-basic" label="Old Password" variant="outlined" onChange={(ev) => setPassword(ev.target.value)}
-                            value={password} style={{ width: '315px' }} type={showPassword ? 'text' : 'password'}
+                        <StyledInput id="outlined-basic" label="Old Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setPassword(ev.target.value)}
+                            value={password} style={{ width: '315px' }} type={showPassword ? 'text' : 'password'} 
                             InputProps={{
                                 endAdornment: (
                                     <InputAdornment position='end' >
                                         {showPassword ? <VisibilityOff onClick={() => setShowPassword(false)} /> :
                                             <Visibility onClick={() => setShowPassword(true)} />}
                                     </InputAdornment>
-                                )
+                                ),
+                                inputProps: {
+                                    maxLength: config.passwordmaxlenght
+                                  }
                             }}
                             required />
                     </Typography>
                     <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
-                        <StyledInput id="outlined-basic" label="New Password" variant="outlined" onChange={(ev) => setNewPassword(ev.target.value)}
+                        <StyledInput id="outlined-basic" label="New Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setNewPassword(ev.target.value)}
                             value={newpassword} style={{ width: '315px' }} type={showPassword ? 'text' : 'password'}
 
                             InputProps={{
@@ -127,7 +137,10 @@ const UpdatePassword = (props) => {
                                         {showConfirmPassword ? <VisibilityOff onClick={() => setShowConfirmPassword(false)} /> :
                                             <Visibility onClick={() => setShowConfirmPassword(true)} />}
                                     </InputAdornment>
-                                )
+                                ),
+                                inputProps: {
+                                    maxLength: config.passwordmaxlenght
+                                  }
                             }}
                             required />
                     </Typography>

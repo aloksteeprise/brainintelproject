@@ -68,6 +68,8 @@ const config = {
     'Open the Microsoft Authenticator app on your smartphone and enter the one-time password code',
   Help: 'Help',
   updatePassword: 'Password have been updated',
+  passwordmaxlenght:15,
+  
   onupdatePasswordLogin: 'Login',
 };
 

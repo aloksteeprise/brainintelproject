@@ -78,6 +78,13 @@ const Login = () => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
+
+  const handleKeyDown = (event) => {
+    if(event.keyCode==32){
+      event.preventDefault();
+    }
+    
+};
   return (
     <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
       <Grid container spacing={2}>
@@ -101,6 +108,7 @@ const Login = () => {
                 value={username}
                 required
                 onChange={(ev) => setUserName(ev.target.value)}
+                onKeyDown={handleKeyDown}
                 InputProps={{
                   endAdornment: <InputAdornment />,
                 }}
@@ -116,6 +124,7 @@ const Login = () => {
                 label="Password"
                 variant="outlined"
                 type={showPassword ? 'text' : 'password'}
+                onKeyDown={handleKeyDown}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
