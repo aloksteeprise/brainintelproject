@@ -124,15 +124,15 @@ const ForgotPassword= (props) => {
                   
                 isRequiredMessage ?
                 <Typography mt={2}>
-                    <p style={{fontSize: 'small', color:'red', justifyContent:'center', display: 'flex'}}>Please fill in all the fields</p>
+                    <p style={{fontSize: 'medium', color:'red', justifyContent:'center', display: 'flex'}}>Please fill in all the fields</p>
                 </Typography>
                 : signupErrorMesageshow ?
                 <Typography mt={2}>
-                    <p style={{fontSize: 'small', color:'red', justifyContent:'center', display: 'flex'}}>{signupErrorMesage}</p>
+                    <p style={{fontSize: 'medium', color:'red', justifyContent:'center', display: 'flex'}}>{signupErrorMesage}</p>
                 </Typography>
                 :  errMailMessage.length > 0 ?
                 <Typography>    
-                    <p style={{fontSize: 'small', color:'red', justifyContent:'center', display: 'flex'}}>{errMailMessage}</p>
+                    <p style={{fontSize: 'medium', color:'red', justifyContent:'center', display: 'flex'}}>{errMailMessage}</p>
                 </Typography> : null
                 
             }

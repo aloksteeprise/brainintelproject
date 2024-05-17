@@ -152,7 +152,7 @@ const Registration = (props) => {
         <Typography mt={2}>
           <p
             style={{
-              fontSize: 'small',
+              fontSize: 'medium',
               color: 'red',
               justifyContent: 'center',
               display: 'flex',
