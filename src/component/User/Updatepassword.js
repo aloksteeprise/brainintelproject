@@ -57,13 +57,16 @@ const UpdatePassword = (props) => {
             const response = await handleUpdatePassword(password, newpassword);
             setPassword("")
             setNewPassword("")
+            debugger;
             if (response === true) {
                 setMessage(response);
                 handleSignOut();
                 setErrorMsg("")
+                localStorage.clear('');
+                setErrorMsg("")
             }
             else {
-                setErrorMsg("Incorrect Old password")
+                setErrorMsg("Incorrect Old password");
             }
             // setSnackbarOpen(true);
 
@@ -101,16 +104,13 @@ const UpdatePassword = (props) => {
                         <HeaderLogin />
                     </Typography>
 
+                    {!messages && (
                     <Typography mt={6}>
                         <p className='subheading'>{config.resetHeading}</p>
                     </Typography>
-                    {/* {
-                        errorMsg.length > 0 ?
-                            <Typography mt={2}>
-                                <p style={{ fontSize: 'small', color: 'red', justifyContent: 'center', display: 'flex' }}>{errorMsg}</p>
-                            </Typography> : null
-                    } */}
+                    )}
 
+{!messages && (
                     <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
                         <StyledInput id="outlined-basic" label="Old Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setPassword(ev.target.value)}
                             value={password} style={{ width: '315px' }} type={showPassword ? 'text' : 'password'} 
@@ -127,6 +127,9 @@ const UpdatePassword = (props) => {
                             }}
                             required />
                     </Typography>
+                    )}
+                    {!messages && (
+
                     <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
                         <StyledInput id="outlined-basic" label="New Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setNewPassword(ev.target.value)}
                             value={newpassword} style={{ width: '315px' }} type={showPassword ? 'text' : 'password'}
@@ -144,13 +147,16 @@ const UpdatePassword = (props) => {
                             }}
                             required />
                     </Typography>
+                     )}
+                    {!messages && (
                     <Typography className="error-message" color="error" mt={2} sx={{ justifyContent: 'center', display: 'flex' }}>
                         {errorMsg}
                     </Typography>
+                     )}
                     {!messages && (
-                        <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={6}>
+                        <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
 
-                            <Button variant='oulined' startIcon={<ArrowBack />} color="#333E5B" style={{ marginRight: '150px' }}
+                            <Button variant='oulined' startIcon={<ArrowBack />} color="#333E5B" style={{ marginRight: '60px' }}
                                 onClick={backtoLogin}>Back
                             </Button>
                             <PrimaryButton variant='contained' className='buttonPrimarylogin' onClick={updatePassword}

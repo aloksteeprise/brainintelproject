@@ -243,11 +243,19 @@ function RecorderPage() {
 
     let hh = today.getHours();
     let mins = today.getMinutes();
+    let secs = today.getSeconds();
+    debugger;
 
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
+    if (hh < 10) hh = '0' + hh;
+    if (mins < 10) mins = '0' + mins;
+    if (secs < 10) secs = '0' + secs;
 
-    return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
+let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
+    // return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
+
+    return "BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
   };
 
   const closeHandler = () => {
@@ -301,6 +309,11 @@ function RecorderPage() {
     setState((state) => ({ ...state, view: false, startAnalysis: true }));
   };
 
+
+  const backtoStartFromRecord = () => {
+    setState((state) => ({ ...state, view: false, startAnalysis: true,record:false }));
+  };
+
   useEffect(() => {
     if (state.recording) {
       startRecording();
@@ -322,6 +335,11 @@ function RecorderPage() {
     if (mediaRecorder && state.recording) {
       mediaRecorder.stop();
     }
+    setState((state) => ({
+      ...state,
+      startAnalysis: false,
+      record: false,
+    }));
   };
 
   const onButtonClick = (key) => {
@@ -429,7 +447,12 @@ function RecorderPage() {
                 >
                   Record
                 </button>
+                
               )}
+              <button className="button" onClick={backtoStartFromRecord}>
+                {' '}
+                Close
+              </button>
             </div>
           </div>
         </div>
@@ -492,7 +515,7 @@ function RecorderPage() {
                   return (
                     <p>
                       {' '}
-                      Here is the link to
+                      {/* Here is the link to */}
                       <label className="custLabel"
                         onClick={() => {
                           onButtonClick(r);

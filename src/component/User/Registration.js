@@ -104,6 +104,7 @@ const Registration = (props) => {
   /* registration*/
   const signUp = async (ev) => {
     ev.preventDefault();
+    
     try {
       checkValidation();
       await register(email, firstName, lastName, password);
@@ -115,7 +116,8 @@ const Registration = (props) => {
 
     } catch (err) {
       console.error('error', err);
-      setSignupErrormsg(err.response.data.message);
+      setSignupErrormsgShow(true);
+      setSignupErrormsg(err.message);
     }
   };
 
@@ -157,7 +159,7 @@ const Registration = (props) => {
         <Typography mt={2}>
           <p
             style={{
-              fontSize: 'small',
+              fontSize: 'medium',
               color: 'red',
               justifyContent: 'center',
               display: 'flex',
@@ -320,7 +322,7 @@ const Registration = (props) => {
           X
         </div>
         <Document
-          file={Pdf}
+          file='https://amplify-brainintelproject-dev-50421-deployment.s3.ap-south-1.amazonaws.com/ConsentFormat.pdf'
           onLoadSuccess={onDocumentLoadSuccess}
           onLoadError={console.error}
         >
