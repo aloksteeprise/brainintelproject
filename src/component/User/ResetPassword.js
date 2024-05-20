@@ -149,7 +149,7 @@ return(
                                     required/>        
                     </Typography>
                     <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>    
-                        <StyledInput id="outlined-basic" label="Confirm Password" variant="outlined " onKeyDown={handleKeyDown} onChange={(ev) => setConfirmPassword(ev.target.value)} 
+                        <StyledInput id="outlined-basic" label="Confirm Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setConfirmPassword(ev.target.value)} 
                                     value={confirmpassword}  style={{width:'315px'}}    type={showPassword? 'text': 'password'} 
                                  
                                     InputProps={{
