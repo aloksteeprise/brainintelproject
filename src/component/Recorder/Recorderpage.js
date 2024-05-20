@@ -409,10 +409,11 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
           <div></div>
           <div className="first">
             <h1 className="head">Start Analysis</h1>
-            {/* <div className="para">
-              Kindly allow the microphone to access. Click the Record button and
-              read the text. Once done, you can click the stop button.
-            </div> */}
+            <div className="para">
+            {state.recording ? (<p></p>):(
+              <p>Kindly allow the microphone to access. Click on the 'Allow' button and read the text. Once done, you can click the 'Stop' button. </p>
+            )} 
+            </div>
             <div
               style={{
                 // border: "1px solid #000" ,
