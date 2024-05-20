@@ -69,7 +69,6 @@ function RecorderPage() {
     };
 
     initializeMediaRecorder();
-    
   }, []);
 
   let analyser, dataArray, bufferLength;
@@ -141,6 +140,7 @@ function RecorderPage() {
   };
 
   const recordHandler = () => {
+    console.log(1);
     stopRecording();
   };
 
@@ -190,7 +190,6 @@ function RecorderPage() {
   };
 
   const createPdf = (folderName,name) => {
-    debugger;
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
     const doc = new jsPDF();
@@ -244,7 +243,6 @@ function RecorderPage() {
     let hh = today.getHours();
     let mins = today.getMinutes();
     let secs = today.getSeconds();
-    debugger;
 
     if (dd < 10) dd = '0' + dd;
     if (mm < 10) mm = '0' + mm;
@@ -273,7 +271,6 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
   const [result, setResult] = useState([]);
   const [s3Files, s3SetFiles] = useState([]);
   const checkResults = () => {
-    debugger;
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
     const folderName = getUserFolderName();
@@ -320,6 +317,12 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
     }
   }, [state.recording]);
 
+  useEffect(() => {
+    if (state.completed) {
+      listenerRecording()
+    }
+  }, [state.completed]);
+
   const startRecording = () => {
     if (mediaRecorder && !state.recording) {
       mediaRecorder.start();
@@ -332,6 +335,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
   };
 
   const stopRecording = () => {
+    console.log(2)
     if (mediaRecorder && state.recording) {
       mediaRecorder.stop();
     }
@@ -342,8 +346,19 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
     }));
   };
 
+  const listenerRecording = () => {
+    if(state.completed){
+      const url = URL.createObjectURL(state.audioFile);
+      const audio = document.createElement("audio");
+      audio.src = url;
+      audio.controls = true;
+      document.getElementById("myrecords").appendChild(audio);
+
+    }
+    
+  }
+
   const onButtonClick = (key) => {
-    debugger;
     // Parameters for downloading object
     const params = {
       Bucket: albumBucketName,
@@ -400,7 +415,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
             </div>
             <div
               style={{
-             
+                // border: "1px solid #000" ,
                 margin: '10px auto',
                 padding: '15px 15px 0px',
               }}
@@ -468,6 +483,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
               Your speech is ready for testing, please listen to it. If not
               audible, please record it again.
             </div>
+            <div id='myrecords'></div>
             <audio id="audioEle" className="audio" />
             <button className="button" onClick={submitHandler}>
               Submit for Analysis
@@ -538,6 +554,8 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
           <div></div>
         </div>
       ) : null}
+
+      
       <Footer />
     </div>
   );
