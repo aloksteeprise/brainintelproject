@@ -409,10 +409,10 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
           <div></div>
           <div className="first">
             <h1 className="head">Start Analysis</h1>
-            <div className="para">
+            {/* <div className="para">
               Kindly allow the microphone to access. Click the Record button and
               read the text. Once done, you can click the stop button.
-            </div>
+            </div> */}
             <div
               style={{
                 // border: "1px solid #000" ,
@@ -434,7 +434,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
                   </div>
                 </div>
               ) : (
-                <div className="myBox">{textContent}</div>
+                <div className=""></div>
               )}
               {state.recording ? (
                 <>
@@ -460,14 +460,14 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
                     recordingHandler();
                   }}
                 >
-                  Record
+                  Allow
                 </button>
                 
               )}
-              <button className="button" onClick={backtoStartFromRecord}>
+              {/* <button className="button" onClick={backtoStartFromRecord}>
                 {' '}
                 Close
-              </button>
+              </button> */}
             </div>
           </div>
         </div>
