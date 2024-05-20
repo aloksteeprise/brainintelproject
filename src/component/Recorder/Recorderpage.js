@@ -69,7 +69,6 @@ function RecorderPage() {
     };
 
     initializeMediaRecorder();
-    
   }, []);
 
   let analyser, dataArray, bufferLength;
@@ -141,6 +140,7 @@ function RecorderPage() {
   };
 
   const recordHandler = () => {
+    console.log(1);
     stopRecording();
   };
 
@@ -320,6 +320,12 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
     }
   }, [state.recording]);
 
+  useEffect(() => {
+    if (state.completed) {
+      listenerRecording()
+    }
+  }, [state.completed]);
+
   const startRecording = () => {
     if (mediaRecorder && !state.recording) {
       mediaRecorder.start();
@@ -332,6 +338,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
   };
 
   const stopRecording = () => {
+    console.log(2)
     if (mediaRecorder && state.recording) {
       mediaRecorder.stop();
     }
@@ -341,6 +348,18 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
       record: false,
     }));
   };
+
+  const listenerRecording = () => {
+    if(state.completed){
+      const url = URL.createObjectURL(state.audioFile);
+      const audio = document.createElement("audio");
+      audio.src = url;
+      audio.controls = true;
+      document.getElementById("myrecords").appendChild(audio);
+
+    }
+    
+  }
 
   const onButtonClick = (key) => {
     debugger;
@@ -468,6 +487,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
               Your speech is ready for testing, please listen to it. If not
               audible, please record it again.
             </div>
+            <div id='myrecords'></div>
             <audio id="audioEle" className="audio" />
             <button className="button" onClick={submitHandler}>
               Submit for Analysis
@@ -538,6 +558,8 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
           <div></div>
         </div>
       ) : null}
+
+      
       <Footer />
     </div>
   );
