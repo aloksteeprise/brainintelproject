@@ -3,12 +3,36 @@ import jwtDecode from 'jwt-decode';
 
 import { fetchAuthSession, getCurrentUser, signIn, signOut, verifyTOTPSetup, signUp,confirmSignUp  } from 'aws-amplify/auth';
 import { Amplify } from 'aws-amplify';
+import AWS from 'aws-sdk';
 import awsconfig from '../aws-exports';
 import {withAuthenticator } from '@aws-amplify/ui-react'
-import { confirmResetPassword ,resendSignUpCode,updatePassword } from 'aws-amplify/auth';
+import { confirmResetPassword ,resendSignUpCode,updatePassword,sendUserAttributeVerificationCode,updateUserAttribute } from 'aws-amplify/auth';
 
 import { resetPassword as awsResetPassword  } from 'aws-amplify/auth';
 Amplify.configure(awsconfig, {ssr: true})
+
+
+var albumBucketName = 'amplify-brainintelproject-dev-50421-deployment';
+  var bucketRegion = 'ap-south-1';
+  var IdentityPoolIdt = 'ap-south-1:9ed22e29-51b1-4d95-84a6-e10ab74b8ce3';
+
+  AWS.config.region = bucketRegion; // Region
+  AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: IdentityPoolIdt,
+  });
+  AWS.config.update({
+    region: bucketRegion,
+    apiVersion: 'latest',
+    credentials: {
+      accessKeyId: 'AKIATZJIQJPCSOHHC4WG',
+      secretAccessKey: '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',
+    },
+  });
+
+  var s3 = new AWS.S3({
+    apiVersion: '2012-10-17',
+    params: { Bucket: albumBucketName },
+  });
 
 function decodeJWT(token) {
   if (!token) return;
@@ -32,13 +56,12 @@ export const login = async (username, password) => {
   */
 
  
-
   const response = await signIn({ username: username, password: password});
   console.log(response);
 
   let result;
 
-  if (response) {
+  if (response && response.isSignedIn) {
     console.log('success');
     // const headers = response?.headers;
     // const authHeader = String(response.headers['authorization'] || '');
@@ -49,25 +72,35 @@ export const login = async (username, password) => {
     //   const userObject = { userId: headers.userid, userInfo: payload?.sub };
     //   localStorage.setItem('userObject', JSON.stringify(userObject));
     // }
-
-    result = username;
+    
+    result = '1-'+username;
     if(response.isSignedIn){
       const userObject = { userId: username, userInfo: "" };
       localStorage.setItem('userObject', JSON.stringify(userObject));
 
     }
-  } else {
-    const userObject = { userId: "", userInfo: "" };
-    localStorage.setItem('userObject', JSON.stringify(userObject));
-    result = 'Invalid username and password';
+  } 
+  else {
+    if(response){
+      const userObject = { userId: "", userInfo: "" };
+      localStorage.setItem('userObject', JSON.stringify(userObject));
+      if(response.nextStep.signInStep = 'CONFIRM_SIGN_UP'){
+        result = '0-'+'Email id is not verified.';
+
+      }
+      else{
+        result = '0-'+'Invalid username and password';
+
+      }
+    }
+    
   }
 
   return result;
 };
 
 export const verifyEmail = async (email, verificationCode) => {
-
-  
+  debugger;
   const response =await confirmSignUp({
     username: email,
     confirmationCode: verificationCode
@@ -85,6 +118,33 @@ export const resendSignUp = async (username) => {
   }
 };
 
+export const validateEmailSendOtp = async (username) => {
+  debugger;
+  let result = '';
+  try {
+   
+     result = await resendSignUpCode({username});
+     result = '1-'+ 'Confirmation code resent successfully';
+    console.log('Confirmation code resent successfully'); 
+   
+  } catch (error) {
+    result = '0-'+ error.message;
+    console.error('Error resending confirmation code:', error);
+  }
+  return result;
+};
+export const userAttributeVerificationCode = async (email, verificationCode) => {
+  debugger;
+  let result;
+  try{
+    await updateUserAttribute(email,verificationCode);
+    result = '1-'+'Success';
+  }
+  catch(error){
+    result = '0-'+ error.message;
+  }
+  return result;
+};
 // Define the handleConfirmResetPassword function
 
 export const handleConfirmResetPassword = async ( username,confirmationCode,  newPassword ) => {
@@ -238,5 +298,57 @@ export const handleSignOut = async () => {
      await signOut();
   } catch (error) {
     console.log('error signing out: ', error);
+    handlerLogs(error.message)
   }
 }
+
+export const handlerLogs = async (message) => {
+  debugger;
+  const loginUser = getLoginUserName();
+  const body = loginUser +' - '+ message;
+  const date = new Date().toISOString().split('T')[0];
+  const logFileName = `logs_${date}.txt`;
+  const bucketName = albumBucketName  // Replace with your bucket name
+  const folderName='Logs'
+  const params = {
+      Bucket: albumBucketName,
+      Key: `${folderName}/${logFileName}`,
+      Body: `${new Date().toISOString()}: ${body}\n`,
+      ContentType: 'text/plain',
+      ACL: 'private'
+  };
+
+  try {
+      // Check if the file already exists
+      const existingObject = await s3.getObject({ Bucket: bucketName, Key: params.Key }).promise();
+      params.Body = existingObject.Body.toString() + params.Body;
+  } catch (err) {
+      // File does not exist, proceed with new log
+      if (err.code !== 'NoSuchKey') {
+          throw err;
+      }
+  }
+
+  try {
+      await s3.putObject(params).promise();
+      return {
+          statusCode: 200,
+          body: JSON.stringify({ message: 'Log written successfully' }),
+      };
+  } catch (err) {
+      return {
+          statusCode: 500,
+          body: JSON.stringify({ error: 'Failed to write log' }),
+      };
+  }
+};
+
+
+const getLoginUserName = () => {
+  const userInfo =  JSON.parse(localStorage.getItem('userObject'));
+  let id ='';
+  if(userInfo){
+    id = userInfo?.userId;
+  }
+ return id;
+};

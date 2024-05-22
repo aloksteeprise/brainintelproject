@@ -17,7 +17,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import PrimaryButton from '../../layout/Buton/PrimaryButton';
 import StyledInput from '../../layout/TextInput';
 import config from '../../translation/config';
-import { login,handleSignOut } from '../../service/Authservice';
+import { login,handleSignOut,handlerLogs } from '../../service/Authservice';
 import {withAuthenticator } from '@aws-amplify/ui-react';
 import MailOutlineIcon from '@mui/icons-material/MailOutline';
 
@@ -31,7 +31,7 @@ const Login = () => {
   const [error, setError] = React.useState('');
   const [page, setPage] = React.useState('login');
   const [isChecked, setChecked] = React.useState(false);
-
+  const [unauthError, setUnauthError] = React.useState('');
 
   localStorage.clear();
   handleSignOut();
@@ -58,11 +58,38 @@ const Login = () => {
     
     setChecked(true);
     try {
-      setError('');
-      await login(username, password);
-      navigate('/record');
-      localStorage.setItem('login',true);
+        setError('');
+        const response = await login(username, password);
+        setUnauthError('');
+        let isResult='0';
+        let isResultMessage='';
+        debugger;
+        if(response){
+            isResult = response.split('-')[0];
+            isResultMessage = response.split('-')[1];
+          }
+          if(isResult=='1'){
+            let LogMessage = 'Success full login'
+            handlerLogs(LogMessage);
+            navigate('/record');
+            localStorage.setItem('login',true);
+          }
+          else{
+            if(isResultMessage=='Email id is not verified.'){
+              setError(isResultMessage);
+              setUnauthError('Email id is not verified')
+            }
+            else{
+              setError(isResultMessage);
+              setChecked(false);
+              setUnauthError('');
+              handlerLogs(isResultMessage);
+            }
+            
+          }
+   
     } catch (error) {
+      debugger;
       setChecked(false);
       localStorage.setItem('login','');
       if (username.length === 0 || password.length === 0) {
@@ -71,8 +98,7 @@ const Login = () => {
         setError(error.message);
         // setError('Invalid Credentials');
       }
-
-      console.error('error', error);
+      handlerLogs(error.message);
     }
   };
 
@@ -86,6 +112,9 @@ const Login = () => {
     }
     
 };
+const validateEmailAdress=(event)=> {
+  navigate('/ValidateEmail');
+}
   return (
     <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
       <Grid container spacing={2}>
@@ -101,6 +130,10 @@ const Login = () => {
               <p className="subheading">{config.loginSubheading}</p>
             </Typography>
             {error ? <p className="error-stmt">{error}</p> : null}
+            {unauthError ?
+            <a href="#" onClick={validateEmailAdress}>
+                             <p style={{textAlign:'center'}}>Validate Email</p>
+                        </a>:null}
             <Typography sx={{ justifyContent: 'center', display: 'flex' }}>
               <StyledInput
                 id="outlined-basic"
@@ -166,7 +199,7 @@ const Login = () => {
                 variant="contained"
                 className="buttonPrimarylogin"
                 onClick={redirectAuthenticator}
-                disabled={isChecked}
+                 disabled={isChecked}
               >
                 {config.loginButton}
               </PrimaryButton>

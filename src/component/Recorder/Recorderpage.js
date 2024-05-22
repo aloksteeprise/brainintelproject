@@ -166,8 +166,10 @@ function RecorderPage() {
   const submitHandler = () => {
     console.log('audio file');
     console.log(state.audioFile);
+    
     let name = getFileName();
     const folderName = getUserFolderName();
+    console.log('folderName-'+ folderName);
     var params = {
       Body: state.audioFile,
       Bucket: albumBucketName,
@@ -226,8 +228,11 @@ function RecorderPage() {
   const getUserFolderName = () => {
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
+    // if(id){
+    //   id = id.split('@')[0];
+    // }
     if(id){
-      id = id.split('@')[0];
+      id = id.toLowerCase();
     }
    return id;
   };

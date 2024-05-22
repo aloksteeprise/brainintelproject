@@ -69,8 +69,12 @@ const config = {
   Help: 'Help',
   updatePassword: 'Password have been updated',
   passwordmaxlenght:15,
+  ResendOTP:"",
   
-  onupdatePasswordLogin: 'Login',
+  onupdatePasswordLogin: 'Please enter the mail for OTP',
+  resendOTPButton: 'Resend OTP',
+  validateEmailOtp: 'Validate OTP',
+  updateOTP: 'Please enter OTP send on mail.',
 };
 
 export default config;
