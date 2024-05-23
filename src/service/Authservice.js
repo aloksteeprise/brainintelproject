@@ -302,7 +302,8 @@ export const handleSignOut = async () => {
 
 export const handlerLogs = async (message) => {
   const loginUser = getLoginUserName();
-  const body = loginUser +' - '+ message;
+  const url = window.location.href;
+  const body = url +' - '+ loginUser +' - '+ message;
   const date = new Date().toISOString().split('T')[0];
   const logFileName = `logs_${date}.txt`;
   const bucketName = albumBucketName  // Replace with your bucket name
