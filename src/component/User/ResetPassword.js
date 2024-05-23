@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
-import { Typography, TextField, Button,Box} from '@mui/material';
+import { Typography, TextField, Button, Box } from '@mui/material';
 import StyledInput from '../../layout/TextInput';
-import  Appside from '../../layout/Appside/Appside'
+import Appside from '../../layout/Appside/Appside'
 import InputAdornment from '@mui/material/InputAdornment';
 import Visibility from '@mui/icons-material/Visibility';
 import ArrowBack from '@mui/icons-material/ArrowBack';
@@ -12,11 +12,9 @@ import HeaderLogin from '../../layout/Header/HeaderLogin'
 import Footer from '../../layout/Footer/Footer';
 import Helplink from '../../layout/Header/HelpLink';
 import config from '../../translation/config';
-import {resetPassword} from '../../service/Authservice';
-import {useNavigate } from 'react-router-dom';
-import {handleConfirmResetPassword} from '../../service/Authservice';
-
-
+import { resetPassword } from '../../service/Authservice';
+import { useNavigate } from 'react-router-dom';
+import { handleConfirmResetPassword, handlerLogs } from '../../service/Authservice';
 import '../../index.css';
 
 
@@ -26,160 +24,169 @@ const ResetPassword = (props) => {
     const [showPassword, setShowPassword] = React.useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
 
-    const [password, setPassword]= React.useState('');
-    const [confirmpassword, setConfirmPassword]= React.useState('');
-    const [otpcode, setOtpcode]= React.useState('');
-    const [token, setToken]= React.useState('');
+    const [password, setPassword] = React.useState('');
+    const [confirmpassword, setConfirmPassword] = React.useState('');
+    const [otpcode, setOtpcode] = React.useState('');
+    const [token, setToken] = React.useState('');
     const [errorMsg, setErrorMsg] = React.useState('');
-    const navigate=useNavigate();
+    const navigate = useNavigate();
     const [isChecked, setChecked] = React.useState(false);
     React.useEffect(() => {
-      const urltoken=  url.split('=').pop();
-      setToken(urltoken);
-    },[])
+        const urltoken = url.split('=').pop();
+        setToken(urltoken);
+    }, [])
 
-    React.useEffect(()=> {
+    React.useEffect(() => {
         setErrorMsg('');
-    },[])
+    }, [])
 
     const backtoLogin = () => {
         navigate('/login');
     }
-
-
-    const checkValidation=()=> {
-        if(password !== confirmpassword){
+    const checkValidation = () => {
+        if (password !== confirmpassword) {
             setErrorMsg('Both the passowrds dont match')
         }
-        else if(password.length ===0 || confirmpassword.length === 0)
-        {
+        else if (password.length === 0 || confirmpassword.length === 0) {
             setErrorMsg('Please fill in both the fields');
         }
         else {
-            resetPassword(token, confirmpassword);
-            navigate('/login');
+            verifyEmailOTPds();
         }
     }
 
-    const resetPasswordAPI= () => {
-       
+    const resetPasswordAPI = () => {
+
         try {
-           checkValidation();
+            checkValidation();
         }
-        catch(err) {
+        catch (err) {
             console.error('err', err);
-        }    
-    }
-
-    const username= JSON.parse(localStorage.getItem('items'));
-
-    const verifyEmailOTPds =  async (ev) => {   
-        ev.preventDefault();
-        setChecked(true);
-        try{
-            debugger;
-            handleConfirmResetPassword(username,otpcode,password);
-            navigate('/');
-            localStorage.removeItem("items")
-            setChecked(false);
         }
-        catch(err){
-            console.log('thes are the errors', err);
+    }
+    const username = JSON.parse(localStorage.getItem('items'));
+
+    const verifyEmailOTPds = async (ev) => {
+        setChecked(true);
+        try {
+            const result = await handleConfirmResetPassword(username, otpcode, password);
+            let isResult='0';
+            let isResultMessage='';
+            if(result){
+                isResult = result.split('-')[0];
+                isResultMessage = result.split('-')[1];
+              }
+              if(isResult=='1'){
+                localStorage.removeItem("items")
+                setChecked(false);
+                handlerLogs('verifyEmailOTPds > Password have been update.');
+                navigate('/');
+              }
+              else{
+                setChecked(false);
+                setErrorMsg(isResultMessage);
+                handlerLogs(`verifyEmailOTPds > `+isResultMessage);
+              }
+        }
+        catch (err) {
+            // console.log('thes are the errors', err);
             setChecked(false);
+            setErrorMsg(err.message);
+            handlerLogs(`verifyEmailOTPd > errors:`+ err.message);
         }
     }
 
     const handleKeyDown = (event) => {
-        if(event.keyCode==32){
-          event.preventDefault();
+        if (event.keyCode == 32) {
+            event.preventDefault();
         }
-        
+
     };
 
-   
- 
-return(
-        <Box sx={{flexGrow: 1, overflow:'hidden'}}>
+
+
+    return (
+        <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
             <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
-                    <Appside/>
+                    <Appside />
                 </Grid>
                 <Grid xs={12} sm={6} >
-                
+
                     <Typography mt={16} >
-                        <HeaderLogin/>
+                        <HeaderLogin />
                     </Typography>
 
                     <Typography mt={6}>
                         <p className='subheading'>{config.resetHeading}</p>
                     </Typography>
                     {
-                            errorMsg.length>0 ?
+                        errorMsg.length > 0 ?
                             <Typography mt={2}>
-                                <p style={{fontSize: 'small', color:'red', justifyContent:'center', display: 'flex'}}>{errorMsg}</p>
-                            </Typography> :null
+                                <p style={{ fontSize: 'small', color: 'red', justifyContent: 'center', display: 'flex' }}>{errorMsg}</p>
+                            </Typography> : null
                     }
-                     <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>    
-                        <StyledInput id="outlined-basic" label="Enter the OTP" variant="outlined" onChange={(ev) => setOtpcode(ev.target.value)} 
-                                    value={otpcode}   style={{width:'315px'}} type='number'
-                                    // InputProps={{
-                                    //     endAdornment: (
-                                    //         <InputAdornment position='end' >
-                                    //            { showPassword ? <VisibilityOff onClick={() => setShowPassword(false)}/>:
-                                    //                             <Visibility  onClick={() =>setShowPassword(true)}/> }
-                                    //         </InputAdornment>
-                                    //     )
-                                    // }}
-                                    required/>        
+                    <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
+                        <StyledInput id="outlined-basic" label="Enter the OTP" variant="outlined" onChange={(ev) => setOtpcode(ev.target.value)}
+                            value={otpcode} style={{ width: '315px' }} type='number'
+                            // InputProps={{
+                            //     endAdornment: (
+                            //         <InputAdornment position='end' >
+                            //            { showPassword ? <VisibilityOff onClick={() => setShowPassword(false)}/>:
+                            //                             <Visibility  onClick={() =>setShowPassword(true)}/> }
+                            //         </InputAdornment>
+                            //     )
+                            // }}
+                            required />
                     </Typography>
-                    <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>    
-                        <StyledInput id="outlined-basic" label="New Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setPassword(ev.target.value)} 
-                                    value={password}   style={{width:'315px'}} type={showPassword? 'text': 'password'}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position='end' >
-                                               { showPassword ? <VisibilityOff onClick={() => setShowPassword(false)}/>:
-                                                                <Visibility  onClick={() =>setShowPassword(true)}/> }
-                                            </InputAdornment>
-                                        ),
-                                        inputProps: {
-                                            maxLength: config.passwordmaxlenght
-                                          }
-                                    }}
-                                    required/>        
+                    <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
+                        <StyledInput id="outlined-basic" label="New Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setPassword(ev.target.value)}
+                            value={password} style={{ width: '315px' }} type={showPassword ? 'text' : 'password'}
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position='end' >
+                                        {showPassword ? <VisibilityOff onClick={() => setShowPassword(false)} /> :
+                                            <Visibility onClick={() => setShowPassword(true)} />}
+                                    </InputAdornment>
+                                ),
+                                inputProps: {
+                                    maxLength: config.passwordmaxlenght
+                                }
+                            }}
+                            required />
                     </Typography>
-                    <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>    
-                        <StyledInput id="outlined-basic" label="Confirm Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setConfirmPassword(ev.target.value)} 
-                                    value={confirmpassword}  style={{width:'315px'}}    type={showPassword? 'text': 'password'} 
-                                 
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position='end'>
-                                               { showConfirmPassword ? <VisibilityOff onClick={() => setShowConfirmPassword(false)}/>:
-                                                                <Visibility  onClick={() =>setShowConfirmPassword(true)}/> }
-                                            </InputAdornment>
-                                        ),
-                                        inputProps: {
-                                            maxLength: config.passwordmaxlenght
-                                          }
-                                    }}
-                                    required/>        
+                    <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
+                        <StyledInput id="outlined-basic" label="Confirm Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setConfirmPassword(ev.target.value)}
+                            value={confirmpassword} style={{ width: '315px' }} type={showPassword ? 'text' : 'password'}
+
+                            InputProps={{
+                                endAdornment: (
+                                    <InputAdornment position='end'>
+                                        {showConfirmPassword ? <VisibilityOff onClick={() => setShowConfirmPassword(false)} /> :
+                                            <Visibility onClick={() => setShowConfirmPassword(true)} />}
+                                    </InputAdornment>
+                                ),
+                                inputProps: {
+                                    maxLength: config.passwordmaxlenght
+                                }
+                            }}
+                            required />
                     </Typography>
-                    <Typography sx={{justifyContent:'center', display: 'flex' }} mt={6}>
-                        
-                    <Button variant='oulined'  startIcon={<ArrowBack/>} color="#333E5B" style={{marginRight: '150px'}}
-                          onClick={backtoLogin}>Back
+                    <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={6}>
+
+                        <Button variant='oulined' startIcon={<ArrowBack />} color="#333E5B" style={{ marginRight: '150px' }}
+                            onClick={backtoLogin}>Back
                         </Button>
-                        <PrimaryButton variant='contained' className='buttonPrimarylogin' disabled={isChecked} onClick={verifyEmailOTPds}
-                            >{config.resetButton}
+                        <PrimaryButton variant='contained' className='buttonPrimarylogin' disabled={isChecked} onClick={resetPasswordAPI}
+                        >{config.resetButton}
                         </PrimaryButton>
-                    </Typography>  
-                    <Footer style='140px'/>
- 
+                    </Typography>
+                    <Footer style='140px' />
+
                 </Grid>
             </Grid>
-    </Box>
-   )
+        </Box>
+    )
 };
 
 

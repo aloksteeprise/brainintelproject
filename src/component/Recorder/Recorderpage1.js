@@ -21,14 +21,12 @@ const RecorderPage = () => {
         navigate("/signin");
     };
     const addAudioElement = (blob) => {
-        debugger;
         const url = URL.createObjectURL(blob);
         const audio = document.createElement("audio");
         audio.src = url;
         audio.controls = true;
         setclassNameDivContent('col-md-12 hidebutton');
-        document.getElementById("myrecords").appendChild(audio); // Append audio element to the local div
-        debugger;
+        document.getElementById("myrecords").appendChild(audio); // Append audio element to the local d
         const blobUrl = URL.createObjectURL(blob)
         const unique_id = uuid();
         const small_id = unique_id.slice(0, 15);
@@ -44,7 +42,6 @@ const RecorderPage = () => {
     // Function to upload file to s3
     const uploadFile = async () => {
         // S3 Bucket Name
-        debugger;
         const S3_BUCKET = "amplify-brainintelproject-dev-50421-deployment";
         // S3 Region
         const REGION = "ap-south-1";
@@ -179,7 +176,6 @@ const RecorderPage = () => {
 
           const s3 = new AWS.S3();
           const createBucket = (bucketName) => {
-            debugger;
             return new Promise((resolve, reject) => {
               const params = {
                 Bucket: bucketName,

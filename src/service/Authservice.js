@@ -100,7 +100,6 @@ export const login = async (username, password) => {
 };
 
 export const verifyEmail = async (email, verificationCode) => {
-  debugger;
   const response =await confirmSignUp({
     username: email,
     confirmationCode: verificationCode
@@ -119,7 +118,6 @@ export const resendSignUp = async (username) => {
 };
 
 export const validateEmailSendOtp = async (username) => {
-  debugger;
   let result = '';
   try {
    
@@ -134,7 +132,6 @@ export const validateEmailSendOtp = async (username) => {
   return result;
 };
 export const userAttributeVerificationCode = async (email, verificationCode) => {
-  debugger;
   let result;
   try{
     await updateUserAttribute(email,verificationCode);
@@ -148,16 +145,17 @@ export const userAttributeVerificationCode = async (email, verificationCode) => 
 // Define the handleConfirmResetPassword function
 
 export const handleConfirmResetPassword = async ( username,confirmationCode,  newPassword ) => {
+  let result;
   try {
-    
-    await confirmResetPassword({username,confirmationCode,  newPassword });
+     await confirmResetPassword({username,confirmationCode,  newPassword });
+    result = '1-'+'Success';
   } catch (error) {
-    console.log(error);
+    result = '0-'+ error.message;
   }
+  return result;
 };
 
 export const handleUpdatePassword = async  (oldPassword, newPassword) =>{
-  debugger;
   let isPasswordChangeDone ='';
   try {
     
@@ -303,7 +301,6 @@ export const handleSignOut = async () => {
 }
 
 export const handlerLogs = async (message) => {
-  debugger;
   const loginUser = getLoginUserName();
   const body = loginUser +' - '+ message;
   const date = new Date().toISOString().split('T')[0];

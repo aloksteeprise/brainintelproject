@@ -63,7 +63,7 @@ const Login = () => {
         setUnauthError('');
         let isResult='0';
         let isResultMessage='';
-        debugger;
+        
         if(response){
             isResult = response.split('-')[0];
             isResultMessage = response.split('-')[1];
@@ -89,7 +89,6 @@ const Login = () => {
           }
    
     } catch (error) {
-      debugger;
       setChecked(false);
       localStorage.setItem('login','');
       if (username.length === 0 || password.length === 0) {

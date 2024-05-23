@@ -1,33 +1,22 @@
 import * as React from 'react';
 import Grid from '@mui/material/Grid';
-import { Typography, TextField, Button,Box} from '@mui/material';
+import { Typography, Button,Box} from '@mui/material';
 import StyledInput from '../../layout/TextInput';
 import  Appside from '../../layout/Appside/Appside'
-import InputAdornment from '@mui/material/InputAdornment';
-import Visibility from '@mui/icons-material/Visibility';
 import ArrowBack from '@mui/icons-material/ArrowBack';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import PrimaryButton from '../../layout/Buton/PrimaryButton';
 import HeaderLogin from '../../layout/Header/HeaderLogin'
 import Footer from '../../layout/Footer/Footer';
-import Helplink from '../../layout/Header/HelpLink';
 import config from '../../translation/config';
-import {resetPassword} from '../../service/Authservice';
 import {useNavigate } from 'react-router-dom';
-import {verifyEmail} from '../../service/Authservice';
+import {verifyEmail,handlerLogs} from '../../service/Authservice';
 
 
 import '../../index.css';
 
 
 const EmailVerificationPage = (props) => {
-
     const url = window.location.href;
-    const [showPassword, setShowPassword] = React.useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = React.useState(false);
-
-    const [password, setPassword]= React.useState('');
-    const [confirmpassword, setConfirmPassword]= React.useState('');
     const [otpcode, setOtpcode]= React.useState('');
     const [token, setToken]= React.useState('');
     const [errorMsg, setErrorMsg] = React.useState('');
@@ -46,56 +35,31 @@ const EmailVerificationPage = (props) => {
     const backtoLogin = () => {
         navigate('/login');
     }
-
-
-    const checkValidation=()=> {
-        if(password !== confirmpassword){
-            setErrorMsg('Both the passowrds dont match')
-        }
-        else if(password.length ===0 || confirmpassword.length === 0)
-        {
-            setErrorMsg('Please fill in both the fields');
-        }
-        else {
-            resetPassword(token, confirmpassword);
-            navigate('/login');
-        }
-    }
-
-    const resetPasswordAPI= () => {
-       
-        try {
-           checkValidation();
-        }
-        catch(err) {
-            console.error('err', err);
-        }    
-    }
-
     const username= JSON.parse(localStorage.getItem('items'));
 
     const verifyEmailOTPds =  async (ev) => {   
         ev.preventDefault();
         setChecked(true);
         try{
-           
             // handleConfirmResetPassword(username,otpcode,password);
-             const resutl = verifyEmail(username,otpcode)
+             const resutl = await verifyEmail(username,otpcode)
             // navigate('/');
             localStorage.removeItem("items")
             setChecked(false);
             setSuccMsg('Your email is verified please login using back button.')
+            setErrorMsg('');
             setOtpcode('');
             setChecked(true);
+            handlerLogs(`verifyEmailOTPds > `+' Your email is verified.')
         }
         catch(err){
             // console.log('thes are the errors', err);
             setErrorMsg(err.message);
             setSuccMsg('')
             setChecked(false);
+            handlerLogs(`verifyEmailOTPds > `+err.message)
         }
     }
-
     const handleKeyDown = (event) => {
         if(event.keyCode==32){
           event.preventDefault();
@@ -103,8 +67,6 @@ const EmailVerificationPage = (props) => {
         
     };
 
-   
- 
 return(
         <Box sx={{flexGrow: 1, overflow:'hidden'}}>
             <Grid container spacing={2}>
@@ -133,7 +95,7 @@ return(
                             </Typography> :null
                     }
                      <Typography sx={{justifyContent:'center', display: 'flex' }} mt={2}>    
-                        <StyledInput id="outlined-basic" label="Enter the OTP" variant="outlined" onChange={(ev) => setOtpcode(ev.target.value)} 
+                        <StyledInput id="outlined-basic" label="Enter the OTP" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setOtpcode(ev.target.value)} 
                                     value={otpcode}   style={{width:'315px'}} type='number'
                                     disabled={isChecked}
                                     required/>        

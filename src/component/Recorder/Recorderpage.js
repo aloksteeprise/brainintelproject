@@ -8,6 +8,7 @@ import AWS from 'aws-sdk';
 import Header from '../Header/Header';
 import Footer from './Footer.js';
 import jsPDF from 'jspdf';
+import {handlerLogs } from '../../service/Authservice';
 
 let mediaRecorder;
 let audioCtx;
@@ -57,14 +58,14 @@ function RecorderPage() {
     const initializeMediaRecorder = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        console.log('getUserMedia success:', stream);
+        handlerLogs('getUserMedia success: >');
         setStreamData(stream);
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         mediaRecorder = new MediaRecorder(stream);
         mediaRecorder.ondataavailable = handleDataAvailable;
         mediaRecorder.onstop = handleRecordingStopped;
       } catch (error) {
-        console.error('getUserMedia error:', error);
+        handlerLogs(`getUserMedia > `+error);
       }
     };
 
@@ -140,7 +141,7 @@ function RecorderPage() {
   };
 
   const recordHandler = () => {
-    console.log(1);
+    handlerLogs('recordHandler> ');
     stopRecording();
   };
 
@@ -155,7 +156,7 @@ function RecorderPage() {
     }
   };
   const handleRecordingStopped = () => {
-    console.log('Recording stopped');
+    handlerLogs(`handleRecordingStopped > `+'Recording stopped');
     setState((prevState) => ({
       ...prevState,
       recording: false,
@@ -164,12 +165,8 @@ function RecorderPage() {
   };
   
   const submitHandler = () => {
-    console.log('audio file');
-    console.log(state.audioFile);
-    
     let name = getFileName();
     const folderName = getUserFolderName();
-    console.log('folderName-'+ folderName);
     var params = {
       Body: state.audioFile,
       Bucket: albumBucketName,
@@ -178,9 +175,9 @@ function RecorderPage() {
     };
     s3.putObject(params, function (err, data) {
       if (err) {
-        console.log(err, err.stack);
+        handlerLogs(`submitHandler > `+err.stack);
       } else {
-        console.log('success');
+        handlerLogs(`submitHandler > `+'success');
         createPdf(folderName,name)
       }
     });
@@ -210,9 +207,9 @@ function RecorderPage() {
     };
     s3.putObject(params, function (err, data) {
       if (err) {
-        console.log(err, err.stack);
+        handlerLogs(`createPdf > `+err.stack);
       } else {
-        console.log('success');
+        handlerLogs(`createPdf > `+'success');
       }
     });
     setState((state) => ({
@@ -255,7 +252,7 @@ function RecorderPage() {
     if (mins < 10) mins = '0' + mins;
     if (secs < 10) secs = '0' + secs;
 
-let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
+    let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
     // return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
 
     return "BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
@@ -285,8 +282,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
           'There was a brutal error viewing your album: ' + err.message
         );
       } else {
-        console.log('list data--');
-        console.log(data);
+        handlerLogs(`checkResults > `+data);
 
         let r = [];
         data.Contents.map((val) => {
@@ -331,7 +327,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
   const startRecording = () => {
     if (mediaRecorder && !state.recording) {
       mediaRecorder.start();
-      console.log('Recording started');
+      handlerLogs('Recording started');
       setState((prevState) => ({
         ...prevState,
         recording: true,
@@ -340,7 +336,6 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
   };
 
   const stopRecording = () => {
-    console.log(2)
     if (mediaRecorder && state.recording) {
       mediaRecorder.stop();
     }
@@ -358,7 +353,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
       audio.src = url;
       audio.controls = true;
       document.getElementById("myrecords").appendChild(audio);
-
+      handlerLogs('listener Recording Appended');
     }
     
   }
@@ -373,7 +368,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
     // Generate a pre-signed URL for the object
     s3.getSignedUrl('getObject', params, (err, url) => {
       if (err) {
-        console.error('Error', err);
+        handlerLogs('getSignedUrl Error' + err);
       } else {
         // Download the object using the generated URL
         window.open(url, '_blank');
@@ -433,7 +428,7 @@ let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+sec
                     <marquee
                       direction="up"
                       className="marquee"
-                      scrollamount="2"
+                      scrollamount="1"
                     >
                       <div className="marqueeText">{textContent}</div>
                     </marquee>

@@ -11,7 +11,6 @@ import Footer from '../../layout/Footer/Footer';
 import config from '../../translation/config';
 import { validateEmailSendOtp,handlerLogs } from '../../service/Authservice';
 import './Login.scss';
-import { Auth } from 'aws-amplify';
 
 
 

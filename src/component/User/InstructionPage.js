@@ -15,7 +15,7 @@ import HeaderLogin from '../../layout/Header/HeaderLogin'
 import Helplink from '../../layout/Header/HelpLink';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Footer from '../../layout/Footer/Footer';
-import { verifyEmail,resendSignUp } from '../../service/Authservice';
+import { verifyEmail,resendSignUp,handlerLogs } from '../../service/Authservice';
 
 const InstructionPage = (props) => {
   //const {setPage} =props;
@@ -51,10 +51,12 @@ const InstructionPage = (props) => {
   
       // Continue with verification if password meets criteria
       await verifyEmail(email, password);
+      handlerLogs('verifyEmailOTP > OTP is verified');
       navigate('/verifyEmail');
     } catch (err) {
       console.log('These are the errors:', err);
       setErrorMsg('Invalid Otp');
+      handlerLogs('verifyEmailOTP Error > '+err.message);
     }
   }
   // const resendEmailOTP = async (ev) => {

@@ -12,9 +12,8 @@ import HeaderLogin from '../../layout/Header/HeaderLogin'
 import Footer from '../../layout/Footer/Footer';
 import Helplink from '../../layout/Header/HelpLink';
 import config from '../../translation/config';
-import { handleSignOut, handleUpdatePassword, resetPassword } from '../../service/Authservice';
+import { handleSignOut, handleUpdatePassword,handlerLogs  } from '../../service/Authservice';
 import { useNavigate } from 'react-router-dom';
-import { handleConfirmResetPassword } from '../../service/Authservice';
 
 import '../../index.css';
 
@@ -50,13 +49,11 @@ const UpdatePassword = (props) => {
 
     const updatePassword = async (ev) => {
         ev.preventDefault();
-        debugger;
         if(newpassword.length<8){
             setErrorMsg("Password must be minimum 8 character");
             return false;
         }
         try {
-            debugger;
             const response = await handleUpdatePassword(password, newpassword);
             let isResult='0';
             let isResultMessage='';
@@ -72,18 +69,16 @@ const UpdatePassword = (props) => {
                 handleSignOut();
                 setErrorMsg("")
                 localStorage.clear('');
+                handlerLogs('updatePassword > '+isResultMessage);
               }
             else{
                 setErrorMsg(isResultMessage);
+                handlerLogs('updatePassword > '+isResultMessage);
             }
-         
-            // setSnackbarOpen(true);
-
-
         }
-
         catch (err) {
             console.log('thes are the errors', err);
+            handlerLogs('updatePassword  Error> '+err.message);
         }
     }
     const handleSnackbarClose = () => {
@@ -119,7 +114,7 @@ const UpdatePassword = (props) => {
                     </Typography>
                     )}
 
-{!messages && (
+                    {!messages && (
                     <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
                         <StyledInput id="outlined-basic" label="Old Password" variant="outlined" onKeyDown={handleKeyDown} onChange={(ev) => setPassword(ev.target.value)}
                             value={password} style={{ width: '315px' }} type={showPassword ? 'text' : 'password'} 

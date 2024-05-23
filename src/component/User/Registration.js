@@ -15,7 +15,7 @@ import PrimaryButton from '../../layout/Buton/PrimaryButton';
 import HeaderLogin from '../../layout/Header/HeaderLogin';
 import Helplink from '../../layout/Header/HelpLink';
 import Footer from '../../layout/Footer/Footer';
-import { register } from '../../service/Authservice';
+import { register,handlerLogs } from '../../service/Authservice';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import './Login.scss';
@@ -111,17 +111,18 @@ const Registration = (props) => {
       // navigate('/login');
       setCheckMail(true);
       //setPage('link');
-
+      handlerLogs('signUp > OTP has been send to user email');
       navigate('/Instruction');
 
     } catch (err) {
-      console.error('error', err);
       setSignupErrormsgShow(true);
       if (password.length <= 8 ){
         setSignupErrormsg("Password must be minimum 8 character");
+        handlerLogs('signUp > '+'Password must be minimum 8 character');
       }
       else{
         setSignupErrormsg(err.message);
+        handlerLogs('signUp > '+err.message);
       }
     }
   };
