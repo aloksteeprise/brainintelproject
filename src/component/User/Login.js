@@ -52,52 +52,64 @@ const Login = () => {
   const redirectRegister = () => {
     setPage('signup');
   };
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
 
   const redirectAuthenticator = async (e) => {
     e.preventDefault();
-    
-    setChecked(true);
-    try {
-        setError('');
-        const response = await login(username, password);
-        setUnauthError('');
-        let isResult='0';
-        let isResultMessage='';
-        
-        if(response){
-            isResult = response.split('-')[0];
-            isResultMessage = response.split('-')[1];
-          }
-          if(isResult=='1'){
-            let LogMessage = 'Success full login'
-            handlerLogs(LogMessage);
-            navigate('/record');
-            localStorage.setItem('login',true);
-          }
-          else{
-            if(isResultMessage=='Email id is not verified.'){
-              setError(isResultMessage);
-              setUnauthError('Email id is not verified')
+    if (!validateEmail(username)) {
+      setError('Invalid email');
+      return false;
+    }
+    else{
+      setChecked(true);
+      try {
+          setError('');
+          const response = await login(username, password);
+          setUnauthError('');
+          let isResult='0';
+          let isResultMessage='';
+          
+          if(response){
+              isResult = response.split('-')[0];
+              isResultMessage = response.split('-')[1];
+            }
+            if(isResult=='1'){
+              let LogMessage = 'Success full login'
+              handlerLogs(LogMessage);
+              navigate('/record');
+              localStorage.setItem('login',true);
             }
             else{
-              setError(isResultMessage);
-              setChecked(false);
-              setUnauthError('');
-              handlerLogs(isResultMessage);
+              if(isResultMessage=='Email id is not verified.'){
+                setError(isResultMessage);
+                setUnauthError('Email id is not verified')
+              }
+              else{
+                setError(isResultMessage);
+                setChecked(false);
+                setUnauthError('');
+                handlerLogs(isResultMessage);
+              }
+              
             }
-            
-          }
-   
-    } catch (error) {
-      setChecked(false);
-      localStorage.setItem('login','');
-      if (username.length === 0 || password.length === 0) {
-        setError('Please fill in both the fields');
-      } else {
-        setError(error.message);
-        // setError('Invalid Credentials');
+     
+      } catch (error) {
+        setChecked(false);
+        localStorage.setItem('login','');
+        if (username.length === 0 || password.length === 0) {
+          setError('Please fill in both the fields');
+        } else {
+          setError(error.message);
+          // setError('Invalid Credentials');
+        }
+        handlerLogs(error.message);
       }
-      handlerLogs(error.message);
     }
   };
 
@@ -108,8 +120,7 @@ const Login = () => {
   const handleKeyDown = (event) => {
     if(event.keyCode==32){
       event.preventDefault();
-    }
-    
+    } 
 };
 const validateEmailAdress=(event)=> {
   navigate('/ValidateEmail');

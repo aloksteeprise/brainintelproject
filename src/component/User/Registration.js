@@ -48,6 +48,7 @@ const Registration = (props) => {
   const [email, setEmail] = React.useState('');
   const [isChecked, setChecked] = React.useState(false);
   const [errMailMessage, setErrorMailMessage] = React.useState('');
+  const [errPasswordMessage, setErrPasswordMessage] = React.useState('');
   const [isRequiredMessage, setIsRequiredmsg] = React.useState(false);
   const [signupErrorMesageshow, setSignupErrormsgShow] = React.useState(false);
   const [signupErrorMesage, setSignupErrormsg] = React.useState('');
@@ -66,6 +67,7 @@ const Registration = (props) => {
     setpassword('');
     setIsRequiredmsg('');
     setErrorMailMessage('');
+    setErrPasswordMessage('');
     setSignupErrormsg('');
     setSignupErrormsgShow('');
 
@@ -79,34 +81,37 @@ const Registration = (props) => {
   };
 
   /*handling error conditions*/
-  const checkValidation = () => {
-    if (
-      email.length === 0 ||
-      firstName.length === 0 ||
-      lastName.length === 0 ||
-      password.length === 0
-    ) {
+  const checkValidation = (ev) => {
+    debugger;
+    setSignupErrormsg('');
+    setErrorMailMessage('');
+    setErrPasswordMessage('');
+    setIsRequiredmsg(false);
+    setSignupErrormsgShow(false);
+    if (email.length === 0 || firstName.length === 0 ||lastName.length === 0 ||password.length === 0) {
       setIsRequiredmsg(true);
-    } else if (!validateEmail(email)) {
+    } 
+    else if (!validateEmail(email)) {
       setErrorMailMessage('Invalid email');
-      setIsRequiredmsg(false);
+      return false;
     } else if (signupErrorMesage.length > 0) {
-      setErrorMailMessage('');
-      setIsRequiredmsg(false);
       setSignupErrormsgShow(true);
-    } else {
-      setIsRequiredmsg(false);
-      setErrorMailMessage('');
-      setSignupErrormsgShow(false);
+      return false;
+    } 
+    else if(password.length < 8){
+      setErrPasswordMessage('Password must be minimum 8 character');
+      return false;
+    }
+    else {
+      signUp(ev);
     }
   };
 
   /* registration*/
   const signUp = async (ev) => {
     ev.preventDefault();
-    
+    debugger;
     try {
-      checkValidation();
       await register(email, firstName, lastName, password);
       // navigate('/login');
       setCheckMail(true);
@@ -116,13 +121,15 @@ const Registration = (props) => {
 
     } catch (err) {
       setSignupErrormsgShow(true);
-      if (password.length <= 8 ){
+      if (password.length < 8 ){
         setSignupErrormsg("Password must be minimum 8 character");
         handlerLogs('signUp > '+'Password must be minimum 8 character');
+        return false;
       }
       else{
         setSignupErrormsg(err.message);
         handlerLogs('signUp > '+err.message);
+        return false;
       }
     }
   };
@@ -246,7 +253,20 @@ const Registration = (props) => {
           required
         />
       </Typography> */}
-
+    {errPasswordMessage.length > 0 && (
+            <Typography>
+              <p
+                style={{
+                  fontSize: 'small',
+                  color: 'red',
+                  justifyContent: 'center',
+                  display: 'flex',
+                }}
+              >
+                {errPasswordMessage}
+              </p>
+            </Typography>
+          )}
       <Typography mt={2} sx={{ justifyContent: 'center', display: 'flex' }}>
         <StyledInput
           id="outlined-basic-password1"
@@ -309,7 +329,7 @@ const Registration = (props) => {
             <PrimaryButton
               variant="contained"
               className="buttonPrimarylogin"
-              onClick={signUp}
+              onClick={checkValidation}
               disabled={!isChecked}
             >
               {config.registrationButton}

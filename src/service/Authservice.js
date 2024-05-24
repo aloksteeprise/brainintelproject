@@ -305,9 +305,11 @@ export const handlerLogs = async (message) => {
   const url = window.location.href;
   const body = url +' - '+ loginUser +' - '+ message;
   const date = new Date().toISOString().split('T')[0];
-  const logFileName = `logs_${date}.txt`;
+  const LoggerFileName = getLoggerFileName();
+  const logFileName = `${LoggerFileName}.txt`;
   const bucketName = albumBucketName  // Replace with your bucket name
   const folderName='Logs'
+  
   const params = {
       Bucket: albumBucketName,
       Key: `${folderName}/${logFileName}`,
@@ -350,3 +352,24 @@ const getLoginUserName = () => {
   }
  return id;
 };
+
+const getLoggerFileName=()=>{
+
+  const today = new Date();
+    const yy = today.getFullYear().toString().substr(-2);
+    let mm = today.getMonth() + 1; // Months start at 0!
+    let dd = today.getDate();
+
+    let hh = today.getHours();
+    let mins = today.getMinutes();
+    let secs = today.getSeconds();
+
+    if (dd < 10) dd = '0' + dd;
+    if (mm < 10) mm = '0' + mm;
+    if (hh < 10) hh = '0' + hh;
+    if (mins < 10) mins = '0' + mins;
+    if (secs < 10) secs = '0' + secs;
+
+    let LoggerFileName='Logger'+ dd + mm + yy ;
+    return LoggerFileName;
+}
