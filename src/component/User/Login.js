@@ -88,7 +88,8 @@ const Login = () => {
             else{
               if(isResultMessage=='Email id is not verified.'){
                 setError(isResultMessage);
-                setUnauthError('Email id is not verified')
+                setUnauthError('Email id is not verified');
+                setChecked(false);
               }
               else{
                 setError(isResultMessage);
