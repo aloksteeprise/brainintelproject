@@ -82,7 +82,6 @@ const Registration = (props) => {
 
   /*handling error conditions*/
   const checkValidation = (ev) => {
-    debugger;
     setSignupErrormsg('');
     setErrorMailMessage('');
     setErrPasswordMessage('');
@@ -110,7 +109,6 @@ const Registration = (props) => {
   /* registration*/
   const signUp = async (ev) => {
     ev.preventDefault();
-    debugger;
     try {
       await register(email, firstName, lastName, password);
       // navigate('/login');
