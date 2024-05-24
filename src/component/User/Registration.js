@@ -82,19 +82,17 @@ const Registration = (props) => {
 
   /*handling error conditions*/
   const checkValidation = (ev) => {
-    setSignupErrormsg('');
+    setSignupErrormsgShow(false);
+    setIsRequiredmsg(false);
+    setIsRequiredmsg(false);
+    setIsRequiredmsg(false);
     setErrorMailMessage('');
     setErrPasswordMessage('');
-    setIsRequiredmsg(false);
-    setSignupErrormsgShow(false);
     if (email.length === 0 || firstName.length === 0 ||lastName.length === 0 ||password.length === 0) {
       setIsRequiredmsg(true);
     } 
     else if (!validateEmail(email)) {
       setErrorMailMessage('Invalid email');
-      return false;
-    } else if (signupErrorMesage.length > 0) {
-      setSignupErrormsgShow(true);
       return false;
     } 
     else if(password.length < 8){
