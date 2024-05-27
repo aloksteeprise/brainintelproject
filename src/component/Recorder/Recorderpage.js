@@ -540,7 +540,7 @@ function RecorderPage() {
                       }
                       >
                         {' '}
-                        {r}
+                        {r.split('/')[1]}
                       </label>
                     </p>
                   );
