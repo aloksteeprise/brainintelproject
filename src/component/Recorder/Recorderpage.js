@@ -191,6 +191,7 @@ function RecorderPage() {
   const createPdf = (folderName,name) => {
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
+    id = id.split('@')[0];
     const doc = new jsPDF();
     doc.text(`Hello ${id}`, 10, 10);
     doc.text('This is a sample PDF file.', 10, 20);
@@ -251,11 +252,10 @@ function RecorderPage() {
     if (hh < 10) hh = '0' + hh;
     if (mins < 10) mins = '0' + mins;
     if (secs < 10) secs = '0' + secs;
-
-    let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
+    //let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
     // return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
-
-    return "BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
+    id = id.split('@')[0];
+    return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
   };
 
   const closeHandler = () => {
