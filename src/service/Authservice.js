@@ -1,12 +1,12 @@
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 
-import { fetchAuthSession, getCurrentUser, signIn, signOut, verifyTOTPSetup, signUp,confirmSignUp  } from 'aws-amplify/auth';
+import { fetchAuthSession, getCurrentUser, signIn, signOut, verifyTOTPSetup, signUp,confirmSignUp,updateUserAttributes,currentAuthenticatedUser,getUserAttributes  } from 'aws-amplify/auth';
 import { Amplify } from 'aws-amplify';
 import AWS from 'aws-sdk';
 import awsconfig from '../aws-exports';
 import {withAuthenticator } from '@aws-amplify/ui-react'
-import { confirmResetPassword ,resendSignUpCode,updatePassword,sendUserAttributeVerificationCode,updateUserAttribute } from 'aws-amplify/auth';
+import { confirmResetPassword ,resendSignUpCode,updatePassword,sendUserAttributeVerificationCode,updateUserAttribute,fetchUserAttributes } from 'aws-amplify/auth';
 
 import { resetPassword as awsResetPassword  } from 'aws-amplify/auth';
 Amplify.configure(awsconfig, {ssr: true})
@@ -55,9 +55,17 @@ export const login = async (username, password) => {
   );
   */
 
+
+
  
-  const response = await signIn({ username: username, password: password});
-  console.log(response);
+  const response = await signIn({ username: username, password: password})
+  .then(user => {
+    debugger;
+    console.log('User signed in:', user);
+    // Proceed to update user attributes
+    return user;
+  })
+  .catch(err => console.log(err));
 
   let result;
 
@@ -170,17 +178,22 @@ export const handleUpdatePassword = async  (oldPassword, newPassword) =>{
 }
 
 
-export const register = async (email, firstName, lastName, password) => {
-  
+export const register = async (email, password) => {
+ 
+  debugger;
   const response = await signUp({
     username: email, // Assuming email as the username
     password: password,
     attributes: {
         email: email,
-        given_name: firstName,
-        family_name: lastName
+        // given_name: firstName,
+        // family_name: lastName,
+     
     }
-});
+
+     
+}
+);
   
 
   
@@ -373,3 +386,23 @@ const getLoggerFileName=()=>{
     let LoggerFileName='Logger'+ dd + mm + yy ;
     return LoggerFileName;
 }
+
+
+export const submitFeedback = async (feedbackValue) => {
+  debugger;
+  try {
+      await updateUserAttributes({
+        userAttributes: {
+          ['custom:Userfeedback']: feedbackValue
+        }
+      });
+
+    console.log('Feedback submitted successfully');
+    return { success: true, message: 'Feedback submitted successfully' };
+  } 
+  catch (error) {
+    console.log('Error submitting feedback:', error);
+    return { success: false, message: 'Error submitting feedback' };
+   
+  }
+};

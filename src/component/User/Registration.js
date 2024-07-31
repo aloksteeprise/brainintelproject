@@ -21,6 +21,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import './Login.scss';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import Visibility from '@mui/icons-material/Visibility';
+import pdfview from '../../../src/document/terms-and-conditions-template.pdf'
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -41,8 +42,8 @@ const customStyles = {
 
 const Registration = (props) => {
   const { setPage } = props;
-  const [firstName, setFirstName] = React.useState('');
-  const [lastName, setLastName] = React.useState('');
+  // const [firstName, setFirstName] = React.useState('');
+  // const [lastName, setLastName] = React.useState('');
   const [password, setpassword] = React.useState('');
   const [modalShow, setModalShow] = React.useState(false);
   const [email, setEmail] = React.useState('');
@@ -61,8 +62,8 @@ const Registration = (props) => {
   const navigate = useNavigate();
   React.useEffect(() => {
     setChecked(false);
-    setFirstName('');
-    setLastName('');
+    // setFirstName('');
+    // setLastName('');
     setEmail('');
     setpassword('');
     setIsRequiredmsg('');
@@ -88,7 +89,10 @@ const Registration = (props) => {
     setIsRequiredmsg(false);
     setErrorMailMessage('');
     setErrPasswordMessage('');
-    if (email.length === 0 || firstName.length === 0 ||lastName.length === 0 ||password.length === 0) {
+    // if (email.length === 0 || firstName.length === 0 ||lastName.length === 0 ||password.length === 0) {
+    //   setIsRequiredmsg(true);
+    // } 
+    if (email.length === 0 || password.length === 0) {
       setIsRequiredmsg(true);
     } 
     else if (!validateEmail(email)) {
@@ -108,7 +112,9 @@ const Registration = (props) => {
   const signUp = async (ev) => {
     ev.preventDefault();
     try {
-      await register(email, firstName, lastName, password);
+      //await register(email, firstName, lastName, password);
+      debugger;
+      await register(email, password);
       // navigate('/login');
       setCheckMail(true);
       //setPage('link');
@@ -158,10 +164,10 @@ const Registration = (props) => {
       <Typography>
         <Helplink />
       </Typography>
-      <Typography mt={8}>
+      <Typography mt={15}>
         <HeaderLogin />
       </Typography>
-      <Typography mt={2}>
+      <Typography mt={4}>
         <p className="subheading">{config.registrationHeading}</p>
       </Typography>
       {isRequiredMessage ? (
@@ -191,7 +197,7 @@ const Registration = (props) => {
           </p>
         </Typography>
       ) : null}
-      <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
+      {/* <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
         <StyledInput
           id="outlined-basic"
           label="First Name"
@@ -201,8 +207,8 @@ const Registration = (props) => {
           value={firstName}
           required
         />
-      </Typography>
-      <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
+      </Typography> */}
+      {/* <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
         <StyledInput
           id="outlined-basic"
           label="Last Name"
@@ -212,7 +218,7 @@ const Registration = (props) => {
           value={lastName}
           required
         />
-      </Typography>
+      </Typography> */}
       {errMailMessage.length > 0 && (
         <Typography>
           <p
@@ -292,7 +298,7 @@ const Registration = (props) => {
 
       
       <Typography sx={{ justifyContent: 'center', display: 'flex' }} mt={2}>
-        <div className="tacbox">
+        {/* <div className="tacbox">
           <input
             className="checkbox-class"
             type="checkbox"
@@ -302,12 +308,14 @@ const Registration = (props) => {
           <label for="checkbox">
             {' '}
             I agree to these{' '}
-            <a href="#" onClick={() => onChangeTerms()}>
+            <a href={pdfview} target="_blank"
+           
+             >
               Terms and Conditions
             </a>
             .
           </label>
-        </div>
+        </div> */}
       </Typography>
       <Typography className="button-container" mt={2}>
         <a
@@ -318,20 +326,20 @@ const Registration = (props) => {
           {config.loginRedirect}
         </a>
 
-        <Tooltip
+        {/* <Tooltip
           title={!isChecked ? 'Please accept the terms and conditions' : null}
-        >
+        > */}
           <span>
             <PrimaryButton
               variant="contained"
               className="buttonPrimarylogin"
               onClick={checkValidation}
-              disabled={!isChecked}
+              // disabled={!isChecked}
             >
               {config.registrationButton}
             </PrimaryButton>
           </span>
-        </Tooltip>
+        {/* </Tooltip> */}
       </Typography>
       <Footer style="85px" />
       <Modal

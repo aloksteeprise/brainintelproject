@@ -6,8 +6,10 @@ import PersonIcon from '@mui/icons-material/Person';
 import './Header.scss';
 import { handleSignOut } from '../../service/Authservice';
 import EditOffSharpIcon from '@mui/icons-material/EditOffSharp';
+import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
+import {checkResults} from '../Recorder/Recorderpage'
 
-const Header = () => {
+const Header = ({ checkResults }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -52,6 +54,10 @@ const Header = () => {
   const onRemoveHandler = () => {
     setOpen(false);
   };
+
+  const reports =( )=>{
+    checkResults();
+  }
   return (
     <div className="about">
       <span className="aham">अहं ब्रह्मास्मि</span>
@@ -74,10 +80,15 @@ const Header = () => {
             <EditOffSharpIcon />
             &nbsp;&nbsp;<span>Update Password</span>
           </button>
+          <button className="logout-button" onClick={() => reports()}>
+            <SummarizeOutlinedIcon />
+            &nbsp;&nbsp;<span>Reports</span>
+          </button>
           <button className="logout-button" onClick={() => onCloseHandler()}>
             <LogoutIcon />
             &nbsp;&nbsp;<span>Log out</span>
           </button>
+       
         </div>
       </div>
     </div>

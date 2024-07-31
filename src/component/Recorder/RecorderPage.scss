@@ -30,13 +30,20 @@
   font-family: 'Proxima';
 }
 
+.image-photo-logo{
+
+background-image: url('../../images/bic.jpeg');
+}
+
 .button {
   font-family: 'Proxima';
   cursor: pointer;
   margin: 20px auto;
+ 
   display: block;
   height: 32px;
   width: 160px;
+  padding: 6px 5px!important;
 }
 
 .icon-div {

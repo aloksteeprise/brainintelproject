@@ -8,13 +8,20 @@ import AWS from 'aws-sdk';
 import Header from '../Header/Header';
 import Footer from './Footer.js';
 import jsPDF from 'jspdf';
-import {handlerLogs } from '../../service/Authservice';
-
+import {handlerLogs ,submitFeedback} from '../../service/Authservice';
+import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Tooltip } from '@mui/material';
+import Snackbar from '@mui/material/Snackbar';
+import blank_pdf from '../../../src/document/Braintel_PDF.pdf'
 let mediaRecorder;
 let audioCtx;
 
 function RecorderPage() {
 
+  const [feedbackValue, setFeedbackValue] = useState('');
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [isChecked, setChecked] = useState(false);
+ const [headingText, setHeadingText] = useState('Kindly allow the microphone to record your voice');
   const [state, setState] = useState({
     startAnalysis: true,
     recording: false,
@@ -23,6 +30,7 @@ function RecorderPage() {
     record: false,
     view: false,
     audioFile: null,
+    feedbackVisible: false,
   });
 
   const textContent =
@@ -137,12 +145,27 @@ function RecorderPage() {
   };
 
   const recordingHandler = () => {
+    setHeadingText('Start Recording'); // Change the heading text
     startRecording();
   };
 
   const recordHandler = () => {
     handlerLogs('recordHandler> ');
     stopRecording();
+  };
+
+  const feedbackHandler = () => {
+    setState(prevState => ({
+      ...prevState,
+      feedbackVisible: true, // Show feedback section
+      completed: false // Hide main content
+    }));
+  };
+
+  
+  
+  const handleFeedbackChange = (event) => {
+    setFeedbackValue(event.target.value);
   };
 
 
@@ -178,7 +201,7 @@ function RecorderPage() {
         handlerLogs(`submitHandler > `+err.stack);
       } else {
         handlerLogs(`submitHandler > `+'success');
-        createPdf(folderName,name)
+        // createPdf(folderName,name)
       }
     });
     setState((state) => ({
@@ -266,12 +289,39 @@ function RecorderPage() {
     }));
   };
 
+  
+  //   setState((state) => ({
+  //     ...state,
+  //     submitted: false,
+  //     completed: true,
+  //     feedbackVisible:false
+  //   }));
+  // };
+
+  const  closeHandler2 =async () =>{
+    const userInfo = getUserInfo();
+    let id = userInfo?.userId;
+    let inputValue =id +'-'+feedbackValue;
+    let result = await submitFeedback(inputValue);
+    setSnackbarMessage(result.message);
+    setSnackbarOpen(true);
+    
+
+
+  }
+  const handleCloseSnackbar = () => {
+    setSnackbarOpen(false);
+  };
   const recordAgainHandler = () => {
     setState((state) => ({ ...state, completed: false, record: true }));
   };
 
   const [result, setResult] = useState([]);
   const [s3Files, s3SetFiles] = useState([]);
+
+ 
+
+
   const checkResults = () => {
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
@@ -300,7 +350,7 @@ function RecorderPage() {
       }
     });
 
-    setState((state) => ({ ...state, startAnalysis: false, view: true }));
+    setState((state) => ({ ...state, completed: false, view: true ,startAnalysis: false}));
   };
 
   const backtoStart = () => {
@@ -375,10 +425,14 @@ function RecorderPage() {
       }
     });
   };
+  const checkHandler = () => {
+    setChecked(!isChecked);
+  };
 
   return (
     <div className="App" style={{ paddingBottom: '80px', overflowY: 'auto' }}>
-      <Header />
+   
+      < Header checkResults={checkResults}/>
       {/* first page */}
       {state.startAnalysis ? (
         <div className="main-div" style={{ marginTop: '120px' }}>
@@ -386,18 +440,41 @@ function RecorderPage() {
           <div className="first">
             <h1 className="head">Welcome {}</h1>
             <div className="para">
-              With the help of our Speech Analysis AI and Machine Learning Tool,
-              you can check your Happiness Index and get results in pdf format,
-              so that you can decide next steps.
+            Experience unparalleled insights of your happiness index  with our advanced Speech Analysis AI and Machine Learning Technology! Empower yourself to take the next steps towards a happier, more fulfilling life. 
             </div>
 
-            <button className="button" onClick={analysisHandler}>
-              Click To Begin
+            <div className="tacbox" style={{marginTop:"20px"}}>
+          <input
+            className="checkbox-class"
+            type="checkbox"
+            checked={isChecked}
+            onChange={checkHandler}
+          />
+          <label for="checkbox">
+            {' '}
+            I read and agree to the attached <a href={blank_pdf} target="_blank"
+           
+           >
+            Consent
+          </a> file{' '}
+            
+            
+          </label>
+        </div>
+
+        <Tooltip
+          title={!isChecked ? 'Please accept the terms and conditions' : null}
+        >
+
+            <button className="button" onClick={analysisHandler} disabled={!isChecked}>
+              Click To Start
             </button>
 
-            <button className="button-secondary" onClick={checkResults}>
+            </Tooltip>
+
+            {/* <button className="button-secondary" onClick={checkResults}>
               Check Results
-            </button>
+            </button> */}
           </div>
           <div></div>
         </div>
@@ -405,13 +482,13 @@ function RecorderPage() {
 
       {/* 2nd page */}
       {state.record ? (
-        <div className="main-div">
+        <div className="main-div"style={{ marginTop: '120px' }}>
           <div></div>
           <div className="first">
-            <h1 className="head">Start Analysis</h1>
+            <h1 className="head">{headingText}</h1>
             <div className="para">
             {state.recording ? (<p></p>):(
-              <p>Kindly allow the microphone to access. Click on the 'Allow' button and read the text. Once done, you can click the 'Stop' button. </p>
+              <p>Kindly Allow the microphone to access. Click on the 'Allow' button and read the text. Once done, you can click the 'Stop' button. </p>
             )} 
             </div>
             <div
@@ -423,7 +500,8 @@ function RecorderPage() {
             >
               {state.recording ? (
                 <div>
-                  <div className="para2">READ ALOUD THE FOLLOWING LINES</div>
+                
+                  <div className="para2">READ ALOUD THE FOLLOWING LINES....</div>
                   <div className="myRecordScrollBox">
                     <marquee
                       direction="up"
@@ -486,26 +564,61 @@ function RecorderPage() {
             </div>
             <div id='myrecords'></div>
             <audio id="audioEle" className="audio" />
-            <button className="button" onClick={submitHandler}>
-              Submit for Analysis
-            </button>
+            <div> 
             <button className="button-secondary" onClick={recordAgainHandler}>
               Record Again
             </button>
+           <br/>
+
+            <button className="button-secondary" onClick={checkResults} style={{marginTop:"5px"}}>
+              Check Results
+            </button>
+
+            <button className="button" onClick={submitHandler}>
+            Submit for pdf report generation
+            </button>
+
+            {/* <button className="button" onClick={feedbackHandler}>
+             Feedback
+            </button> */}
+            </div>
+          
           </div>
           <div></div>
         </div>
       ) : null}
 
+
+  {state.feedbackVisible && (
+        <div className="feedback-section" style={{ marginTop: '120px' }}>
+          <FormControl component="fieldset">
+            <h1 component="legend" className="head">Feedback on Report</h1>
+            <RadioGroup
+              aria-label="feedback"
+              name="feedback"
+              value={feedbackValue}
+              onChange={handleFeedbackChange}
+            >
+              <FormControlLabel value="20" control={<Radio />} label="20%" />
+              <FormControlLabel value="40" control={<Radio />} label="40%" />
+              <FormControlLabel value="60" control={<Radio />} label="60%" />
+              <FormControlLabel value="80" control={<Radio />} label="80%" />
+            </RadioGroup>
+          </FormControl>
+
+          <button className="button" onClick={closeHandler2}>
+              Submit
+            </button>
+        </div>
+      )}
       {/* 4th page */}
       {state.submitted ? (
         <div className="main-div" style={{ marginTop: '120px' }}>
           <div></div>
           <div className="first">
-            <h1 className="head">Recording submitted</h1>
+            <h1 className="head">Check Your Reports</h1>
             <div className="para">
-              We will analyze the recording and share analysis with you shortly.
-              Please check Results section after some time.
+            Wait for 10 minutes for the report. 
             </div>
             {/* <div className="FeedbackForm">
               <h1>Feedback</h1>
@@ -522,7 +635,11 @@ function RecorderPage() {
         <div className="main-div" style={{ marginTop: '120px' }}>
           <div></div>
           <div className="first">
-            <h1 className="head">View Analysis Results</h1>
+            <h1 className="head">Click to Check the PDF Report</h1>
+            <button className="button" onClick={backtoStart}>
+                {' '}
+                Close
+              </button>
             <div style={{ fontFamily: 'Proxima' }}>
               {result.length === 0 && <p> No records found!</p>}
 
@@ -546,10 +663,7 @@ function RecorderPage() {
                   );
                 })}
 
-              <button className="button" onClick={backtoStart}>
-                {' '}
-                Close
-              </button>
+              
             </div>
           </div>
           <div></div>
@@ -558,6 +672,12 @@ function RecorderPage() {
 
       
       <Footer />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        message={snackbarMessage}
+      />
     </div>
   );
 }

@@ -1,12 +1,15 @@
 import config from '../../translation/config';
 import * as React from 'react';
-import companyLogo from './companyLogo.jpeg';
+import companyLogo from '../../images/bic.jpeg';
+
 
 const HeaderLogin = () => {
   return (
     <div style={{ position: 'relative', textAlign: 'center' }}>
       <img
-        src="https://amplify-brainintelproject-dev-50421-deployment.s3.ap-south-1.amazonaws.com/companyLogo.jpeg"
+        // // src="src/images/bic.jpeg"
+        // className='image-photo-logo'
+        src={companyLogo}
         alt="Company Logo"
         style={{
           width: '100px',

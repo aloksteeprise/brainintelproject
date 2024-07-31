@@ -119,9 +119,10 @@ const Login = () => {
   };
 
   const handleKeyDown = (event) => {
-    if(event.keyCode==32){
-      event.preventDefault();
-    } 
+    // if(event.keyCode==32){
+debugger
+    //   event.preventDefault();
+    // } 
 };
 const validateEmailAdress=(event)=> {
   navigate('/ValidateEmail');
@@ -153,7 +154,7 @@ const validateEmailAdress=(event)=> {
                 value={username}
                 required
                 onChange={(ev) => setUserName(ev.target.value)}
-                onKeyDown={handleKeyDown}
+                // onKeyDown={handleKeyDown}
                 InputProps={{
                   endAdornment: <InputAdornment />
                 }}
@@ -169,7 +170,7 @@ const validateEmailAdress=(event)=> {
                 label="Password"
                 variant="outlined"
                 type={showPassword ? 'text' : 'password'}
-                onKeyDown={handleKeyDown}
+                // onKeyDown={handleKeyDown}
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
