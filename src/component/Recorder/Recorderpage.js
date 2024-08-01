@@ -8,10 +8,10 @@ import AWS from 'aws-sdk';
 import Header from '../Header/Header';
 import Footer from './Footer.js';
 import jsPDF from 'jspdf';
-import {handlerLogs ,submitFeedback} from '../../service/Authservice';
+import { handlerLogs, submitFeedback, handleFetchUserAttributes } from '../../service/Authservice';
 import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Tooltip } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
-import blank_pdf from '../../../src/document/Braintel_PDF.pdf'
+import pdf from '../../../src/document/consent.pdf'
 let mediaRecorder;
 let audioCtx;
 
@@ -21,7 +21,9 @@ function RecorderPage() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isChecked, setChecked] = useState(false);
- const [headingText, setHeadingText] = useState('Kindly allow the microphone to record your voice');
+  const [attributes, setAttributes] = useState(null); 
+  const [showTable, setShowTable] = useState(false);
+  const [headingText, setHeadingText] = useState('Kindly allow the microphone to record your voice');
   const [state, setState] = useState({
     startAnalysis: true,
     recording: false,
@@ -31,6 +33,7 @@ function RecorderPage() {
     view: false,
     audioFile: null,
     feedbackVisible: false,
+
   });
 
   const textContent =
@@ -73,7 +76,7 @@ function RecorderPage() {
         mediaRecorder.ondataavailable = handleDataAvailable;
         mediaRecorder.onstop = handleRecordingStopped;
       } catch (error) {
-        handlerLogs(`getUserMedia > `+error);
+        handlerLogs(`getUserMedia > ` + error);
       }
     };
 
@@ -162,8 +165,8 @@ function RecorderPage() {
     }));
   };
 
-  
-  
+
+
   const handleFeedbackChange = (event) => {
     setFeedbackValue(event.target.value);
   };
@@ -179,14 +182,14 @@ function RecorderPage() {
     }
   };
   const handleRecordingStopped = () => {
-    handlerLogs(`handleRecordingStopped > `+'Recording stopped');
+    handlerLogs(`handleRecordingStopped > ` + 'Recording stopped');
     setState((prevState) => ({
       ...prevState,
       recording: false,
       completed: true,
     }));
   };
-  
+
   const submitHandler = () => {
     let name = getFileName();
     const folderName = getUserFolderName();
@@ -198,9 +201,9 @@ function RecorderPage() {
     };
     s3.putObject(params, function (err, data) {
       if (err) {
-        handlerLogs(`submitHandler > `+err.stack);
+        handlerLogs(`submitHandler > ` + err.stack);
       } else {
-        handlerLogs(`submitHandler > `+'success');
+        handlerLogs(`submitHandler > ` + 'success');
         // createPdf(folderName,name)
       }
     });
@@ -211,7 +214,7 @@ function RecorderPage() {
     }));
   };
 
-  const createPdf = (folderName,name) => {
+  const createPdf = (folderName, name) => {
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
     id = id.split('@')[0];
@@ -231,9 +234,9 @@ function RecorderPage() {
     };
     s3.putObject(params, function (err, data) {
       if (err) {
-        handlerLogs(`createPdf > `+err.stack);
+        handlerLogs(`createPdf > ` + err.stack);
       } else {
-        handlerLogs(`createPdf > `+'success');
+        handlerLogs(`createPdf > ` + 'success');
       }
     });
     setState((state) => ({
@@ -252,10 +255,10 @@ function RecorderPage() {
     // if(id){
     //   id = id.split('@')[0];
     // }
-    if(id){
+    if (id) {
       id = id.toLowerCase();
     }
-   return id;
+    return id;
   };
 
   const getFileName = () => {
@@ -278,7 +281,7 @@ function RecorderPage() {
     //let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
     // return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
     id = id.split('@')[0];
-    return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
+    return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins + '' + secs;
   };
 
   const closeHandler = () => {
@@ -289,7 +292,7 @@ function RecorderPage() {
     }));
   };
 
-  
+
   //   setState((state) => ({
   //     ...state,
   //     submitted: false,
@@ -298,6 +301,7 @@ function RecorderPage() {
   //   }));
   // };
 
+
   const  closeHandler2 =async () =>{
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
@@ -305,10 +309,48 @@ function RecorderPage() {
     let result = await submitFeedback(inputValue);
     setSnackbarMessage(result.message);
     setSnackbarOpen(true);
-    
-
-
+    setState((state) => ({
+      ...state,
+      completed: true,
+      
+      feedbackVisible: false
+    }));
   }
+
+  // const closeHandler2 = async () => {
+  //   const userInfo = getUserInfo();
+  //   let id = userInfo?.userId;
+  //   let inputValue = id + '-' + feedbackValue;
+  //   let result = await submitFeedback(inputValue);
+  //   setSnackbarMessage(result.message);
+  //   setSnackbarOpen(true);
+
+  //   if (result.success) {
+  //     try {
+  //       const userAttributes = await handleFetchUserAttributes();
+  //       setAttributes(userAttributes);
+  //       setShowTable(true);
+  //       setState((state) => ({
+  //         ...state,
+
+  //         feedbackVisible: false
+  //       }));
+
+  //     } catch (error) {
+  //       console.error('Error fetching user attributes:', error);
+  //       setAttributes(null);
+  //     }
+  //   }
+  // };
+  // const getFeedbackValue = (feedback) => {
+  //   if (feedback) {
+  //     const parts = feedback.split('-');
+  //     return parts.length > 1 ? parts[1] : 'N/A';
+  //   }
+  //   return 'N/A';
+  // };
+
+
   const handleCloseSnackbar = () => {
     setSnackbarOpen(false);
   };
@@ -319,7 +361,7 @@ function RecorderPage() {
   const [result, setResult] = useState([]);
   const [s3Files, s3SetFiles] = useState([]);
 
- 
+
 
 
   const checkResults = () => {
@@ -332,7 +374,7 @@ function RecorderPage() {
           'There was a brutal error viewing your album: ' + err.message
         );
       } else {
-        handlerLogs(`checkResults > `+data);
+        handlerLogs(`checkResults > ` + data);
 
         let r = [];
         data.Contents.map((val) => {
@@ -350,7 +392,7 @@ function RecorderPage() {
       }
     });
 
-    setState((state) => ({ ...state, completed: false, view: true ,startAnalysis: false}));
+    setState((state) => ({ ...state, completed: false, view: true, startAnalysis: false }));
   };
 
   const backtoStart = () => {
@@ -359,7 +401,7 @@ function RecorderPage() {
 
 
   const backtoStartFromRecord = () => {
-    setState((state) => ({ ...state, view: false, startAnalysis: true,record:false }));
+    setState((state) => ({ ...state, view: false, startAnalysis: true, record: false }));
   };
 
   useEffect(() => {
@@ -397,7 +439,7 @@ function RecorderPage() {
   };
 
   const listenerRecording = () => {
-    if(state.completed){
+    if (state.completed) {
       const url = URL.createObjectURL(state.audioFile);
       const audio = document.createElement("audio");
       audio.src = url;
@@ -405,7 +447,7 @@ function RecorderPage() {
       document.getElementById("myrecords").appendChild(audio);
       handlerLogs('listener Recording Appended');
     }
-    
+
   }
 
   const onButtonClick = (key) => {
@@ -431,44 +473,44 @@ function RecorderPage() {
 
   return (
     <div className="App" style={{ paddingBottom: '80px', overflowY: 'auto' }}>
-   
-      < Header checkResults={checkResults}/>
+
+      < Header checkResults={checkResults} />
       {/* first page */}
       {state.startAnalysis ? (
         <div className="main-div" style={{ marginTop: '120px' }}>
           <div></div>
           <div className="first">
-            <h1 className="head">Welcome {}</h1>
+            <h1 className="head">Welcome { }</h1>
             <div className="para">
-            Experience unparalleled insights of your happiness index  with our advanced Speech Analysis AI and Machine Learning Technology! Empower yourself to take the next steps towards a happier, more fulfilling life. 
+              Experience unparalleled insights of your happiness index  with our advanced Speech Analysis AI and Machine Learning Technology! Empower yourself to take the next steps towards a happier, more fulfilling life.
             </div>
 
-            <div className="tacbox" style={{marginTop:"20px"}}>
-          <input
-            className="checkbox-class"
-            type="checkbox"
-            checked={isChecked}
-            onChange={checkHandler}
-          />
-          <label for="checkbox">
-            {' '}
-            I read and agree to the attached <a href={blank_pdf} target="_blank"
-           
-           >
-            Consent
-          </a> file{' '}
-            
-            
-          </label>
-        </div>
+            <div className="tacbox" style={{ marginTop: "20px" }}>
+              <input
+                className="checkbox-class"
+                type="checkbox"
+                checked={isChecked}
+                onChange={checkHandler}
+              />
+              <label for="checkbox">
+                {' '}
+                I read and agree to the attached <a href={pdf} target="_blank"
 
-        <Tooltip
-          title={!isChecked ? 'Please accept the terms and conditions' : null}
-        >
+                >
+                  Consent
+                </a> file{' '}
 
-            <button className="button" onClick={analysisHandler} disabled={!isChecked}>
-              Click To Start
-            </button>
+
+              </label>
+            </div>
+
+            <Tooltip
+              title={!isChecked ? 'Please accept the terms and conditions' : null}
+            >
+
+              <button className="button" onClick={analysisHandler} disabled={!isChecked}>
+                Click To Start
+              </button>
 
             </Tooltip>
 
@@ -482,14 +524,14 @@ function RecorderPage() {
 
       {/* 2nd page */}
       {state.record ? (
-        <div className="main-div"style={{ marginTop: '120px' }}>
+        <div className="main-div" style={{ marginTop: '120px' }}>
           <div></div>
           <div className="first">
             <h1 className="head">{headingText}</h1>
             <div className="para">
-            {state.recording ? (<p></p>):(
-              <p>Kindly Allow the microphone to access. Click on the 'Allow' button and read the text. Once done, you can click the 'Stop' button. </p>
-            )} 
+              {state.recording ? (<p></p>) : (
+                <p>Kindly Allow the microphone to access. Click on the 'Allow' button and read the text. Once done, you can click the 'Stop' button. </p>
+              )}
             </div>
             <div
               style={{
@@ -500,7 +542,7 @@ function RecorderPage() {
             >
               {state.recording ? (
                 <div>
-                
+
                   <div className="para2">READ ALOUD THE FOLLOWING LINES....</div>
                   <div className="myRecordScrollBox">
                     <marquee
@@ -541,7 +583,7 @@ function RecorderPage() {
                 >
                   Allow
                 </button>
-                
+
               )}
               {/* <button className="button" onClick={backtoStartFromRecord}>
                 {' '}
@@ -564,32 +606,32 @@ function RecorderPage() {
             </div>
             <div id='myrecords'></div>
             <audio id="audioEle" className="audio" />
-            <div> 
-            <button className="button-secondary" onClick={recordAgainHandler}>
-              Record Again
-            </button>
-           <br/>
+            <div>
+              <button className="button-secondary" onClick={recordAgainHandler}>
+                Record Again
+              </button>
+              <br />
 
-            <button className="button-secondary" onClick={checkResults} style={{marginTop:"5px"}}>
-              Check Results
-            </button>
+              <button className="button-secondary" onClick={checkResults} style={{ marginTop: "5px" }}>
+                Check Results
+              </button>
 
-            <button className="button" onClick={submitHandler}>
-            Submit for pdf report generation
-            </button>
+              <button className="button" onClick={submitHandler}>
+                Submit for pdf report generation
+              </button>
 
-            {/* <button className="button" onClick={feedbackHandler}>
-             Feedback
-            </button> */}
+              {/* <button className="button" onClick={feedbackHandler}>
+                Feedback
+              </button> */}
             </div>
-          
+
           </div>
           <div></div>
         </div>
       ) : null}
 
 
-  {state.feedbackVisible && (
+      {state.feedbackVisible && (
         <div className="feedback-section" style={{ marginTop: '120px' }}>
           <FormControl component="fieldset">
             <h1 component="legend" className="head">Feedback on Report</h1>
@@ -607,10 +649,31 @@ function RecorderPage() {
           </FormControl>
 
           <button className="button" onClick={closeHandler2}>
-              Submit
-            </button>
+            Submit
+          </button>
         </div>
       )}
+
+      {/* {showTable && attributes && (
+
+        <div className='feedback-section' style={{display:"flex",justifyContent:"center",marginTop:"120px"}}>
+          <table className="table table-striped table-bordered table-hover">
+            <thead className="thead-dark">
+              <tr>
+                <th>Email</th>
+                <th>Feedback</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{attributes['email'] || 'N/A'}</td>
+                <td>{getFeedbackValue(attributes['custom:Userfeedback']) || 'N/A'}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      )} */}
+
       {/* 4th page */}
       {state.submitted ? (
         <div className="main-div" style={{ marginTop: '120px' }}>
@@ -618,7 +681,7 @@ function RecorderPage() {
           <div className="first">
             <h1 className="head">Check Your Reports</h1>
             <div className="para">
-            Wait for 10 minutes for the report. 
+              Wait for 10 minutes for the report.
             </div>
             {/* <div className="FeedbackForm">
               <h1>Feedback</h1>
@@ -637,9 +700,9 @@ function RecorderPage() {
           <div className="first">
             <h1 className="head">Click to Check the PDF Report</h1>
             <button className="button" onClick={backtoStart}>
-                {' '}
-                Close
-              </button>
+              {' '}
+              Close
+            </button>
             <div style={{ fontFamily: 'Proxima' }}>
               {result.length === 0 && <p> No records found!</p>}
 
@@ -654,7 +717,7 @@ function RecorderPage() {
                         onClick={() => {
                           onButtonClick(r);
                         }
-                      }
+                        }
                       >
                         {' '}
                         {r.split('/')[1]}
@@ -663,14 +726,14 @@ function RecorderPage() {
                   );
                 })}
 
-              
+
             </div>
           </div>
           <div></div>
         </div>
       ) : null}
 
-      
+
       <Footer />
       <Snackbar
         open={snackbarOpen}
