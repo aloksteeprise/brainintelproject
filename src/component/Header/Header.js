@@ -7,7 +7,7 @@ import './Header.scss';
 import { handleSignOut } from '../../service/Authservice';
 import EditOffSharpIcon from '@mui/icons-material/EditOffSharp';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
-import {checkResults} from '../Recorder/Recorderpage'
+import { checkResults } from '../Recorder/Recorderpage'
 
 const Header = ({ checkResults }) => {
   const navigate = useNavigate();
@@ -55,12 +55,31 @@ const Header = ({ checkResults }) => {
     setOpen(false);
   };
 
-  const reports =( )=>{
+  const reports = () => {
     checkResults();
   }
   return (
     <div className="about">
-      <span className="aham">अहं ब्रह्मास्मि</span>
+      <span className="aham">
+
+        <a href='/record'>
+        <img
+          src='https://amplify-brainintelproject-dev-50421-deployment.s3.ap-south-1.amazonaws.com/companyLogo.jpeg'
+          alt="Company Logo"
+          style={{
+            width: '65px',
+            marginTop: "1px",
+            height: "65px",
+            margin: '0 auto',
+            marginTop: '-15px',
+            borderRadius: "33px",
+
+          }}
+
+        />
+        </a>
+
+      </span>
       <div className="about-text" onClick={() => setOpen(true)}>
         {user?.name?.charAt(0).toUpperCase()}
       </div>
@@ -88,7 +107,7 @@ const Header = ({ checkResults }) => {
             <LogoutIcon />
             &nbsp;&nbsp;<span>Log out</span>
           </button>
-       
+
         </div>
       </div>
     </div>
