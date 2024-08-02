@@ -8,7 +8,7 @@ import AWS from 'aws-sdk';
 import Header from '../Header/Header';
 import Footer from './Footer.js';
 import jsPDF from 'jspdf';
-import { handlerLogs, submitFeedback, handleFetchUserAttributes } from '../../service/Authservice';
+import { handlerLogs, submitFeedback, handleFetchUserAttributes ,latestUserAttributes} from '../../service/Authservice';
 import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Tooltip } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import { array } from 'prop-types';
@@ -26,6 +26,7 @@ function RecorderPage() {
   const [attributes, setAttributes] = useState(null); 
   const [showTable, setShowTable] = useState(false);
   const [userfeedbackcount , setUserFeedbackcount ] = useState("0")
+  const [latesfeedbackcount , setLatestFeedbackcount ] = useState("")
   const [headingText, setHeadingText] = useState('Kindly allow the microphone to record your voice');
   const [state, setState] = useState({
     startAnalysis: true,
@@ -161,6 +162,7 @@ function RecorderPage() {
   };
 
   const feedbackHandler = () => {
+    fetchFeedbackStatus();
     setState(prevState => ({
       ...prevState,
       feedbackVisible: true, // Show feedback section
@@ -170,6 +172,7 @@ function RecorderPage() {
     completed: false,
 
     }));
+  
   };
 
 
@@ -198,60 +201,60 @@ function RecorderPage() {
   };
 
 
-  const submitHandler = () => {
-    let name = getFileName();
-    const folderName = getUserFolderName();
-    var params = {
-      Body: state.audioFile,
-      Bucket: albumBucketName,
-      Key: `${folderName}/${name + '.wav'}`,
-      // Key: name + '.wav',
-    };
-    s3.putObject(params, function (err, data) {
-      if (err) {
-        handlerLogs(`submitHandler > ` + err.stack);
-      } else {
-        setFeedbackFilename(name);
-        debugger;
-        setUserFeedbackcount("0")
-        handlerLogs(`submitHandler > ` + 'success');
-
-        // createPdf(folderName,name)
-      }
-    });
-    setState((state) => ({
-      ...state,
-      completed: false,
-      submitted: true,
-    }));
-  };
-
-
-  // const submitHandler = async () => {
+  // const submitHandler = () => {
   //   let name = getFileName();
   //   const folderName = getUserFolderName();
   //   var params = {
   //     Body: state.audioFile,
   //     Bucket: albumBucketName,
   //     Key: `${folderName}/${name + '.wav'}`,
+  //     // Key: name + '.wav',
   //   };
-  
-  //   s3.putObject(params, async function (err, data) {
+  //   s3.putObject(params, function (err, data) {
   //     if (err) {
   //       handlerLogs(`submitHandler > ` + err.stack);
   //     } else {
   //       setFeedbackFilename(name);
-  //       await submitFeedback("", "0");  // Reset to "0" on new submission
+  //       debugger;
+  //       setUserFeedbackcount("0")
   //       handlerLogs(`submitHandler > ` + 'success');
+
+  //       // createPdf(folderName,name)
   //     }
   //   });
-  
   //   setState((state) => ({
   //     ...state,
   //     completed: false,
   //     submitted: true,
   //   }));
   // };
+
+
+  const submitHandler = async () => {
+    let name = getFileName();
+    const folderName = getUserFolderName();
+    var params = {
+      Body: state.audioFile,
+      Bucket: albumBucketName,
+      Key: `${folderName}/${name + '.wav'}`,
+    };
+  
+    s3.putObject(params, async function (err, data) {
+      if (err) {
+        handlerLogs(`submitHandler > ` + err.stack);
+      } else {
+        setFeedbackFilename(name);
+        // await submitFeedback("", "0");  // Reset to "0" on new submission
+        handlerLogs(`submitHandler > ` + 'success');
+      }
+    });
+  
+    setState((state) => ({
+      ...state,
+      completed: false,
+      submitted: true,
+    }));
+  };
   
 
   const createPdf = (folderName, name) => {
@@ -343,6 +346,9 @@ function RecorderPage() {
   //   }));
   // };
 
+
+  
+
   const  closeHandler2 =async () =>{
     debugger;
     const userInfo = getUserInfo();
@@ -371,6 +377,45 @@ function RecorderPage() {
 
 
 
+  // useEffect(() => {
+  //   const fetchFeedbackStatus = async () => {
+  //     try {
+  //       const userAttributes = await latestUserAttributes();
+  //       const feedbackStatus = userAttributes['custom:LatestFeedback'];
+  //       setLatestFeedbackcount(feedbackStatus);
+  //       console.log('Latest Feedback Value:', feedbackStatus); // Log the value
+
+  //       // Hide feedback section if feedbackStatus is 1
+  //       if (feedbackStatus === "1") {
+  //         setState((prevState) => ({ ...prevState, feedbackVisible: false }));
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching user attributes:', error);
+  //     }
+  //   };
+
+  //   fetchFeedbackStatus();
+  // }, []);
+
+  const fetchFeedbackStatus = async () => {
+    try {
+      const userAttributes = await latestUserAttributes();
+      const feedbackStatus = userAttributes['custom:LatestFeedback'];
+      setLatestFeedbackcount(feedbackStatus);
+      console.log('Latest Feedback Value:', feedbackStatus); // Log the value
+
+      // Hide feedback section if feedbackStatus is 1
+      if (feedbackStatus === "1") {
+        setState((prevState) => ({ ...prevState, feedbackVisible: false }));
+      }
+    } catch (error) {
+      console.error('Error fetching user attributes:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFeedbackStatus();
+  }, []);
 
 
   
@@ -400,13 +445,13 @@ function RecorderPage() {
   //     }
   //   }
   // };
-  // const getFeedbackValue = (feedback) => {
-  //   if (feedback) {
-  //     const parts = feedback.split('-');
-  //     return parts.length > 1 ? parts[1] : 'N/A';
-  //   }
-  //   return 'N/A';
-  // };
+  const getFeedbackValue = (feedback) => {
+    if (feedback) {
+      const parts = feedback.split('-');
+      return parts.length > 1 ? parts[1] : 'N/A';
+    }
+    return 'N/A';
+  };
 
 
   const handleCloseSnackbar = () => {
@@ -443,7 +488,7 @@ function RecorderPage() {
         }
       }
     });
-    setState((state) => ({ ...state, completed: false, view: true, startAnalysis: false,submitted:false ,  record: false,}));
+    setState((state) => ({ ...state, completed: false, view: true, startAnalysis: false,submitted:false ,  recording: false,}));
   };
   
   
@@ -573,9 +618,9 @@ const ReportActivity =( )=>{
 
             </Tooltip>
 
-            {/* <button className="button-secondary" onClick={checkResults}>
-              Check Results
-            </button> */}
+            <button className="button-secondary" onClick={checkResults}>
+              Reports
+            </button>
           </div>
           <div></div>
         </div>
@@ -672,13 +717,13 @@ const ReportActivity =( )=>{
               <br />
 
               {/* <button className="button-secondary" onClick={checkResults} style={{ marginTop: "5px" }}>
-                Check Results
+                Reports
               </button> */}
 
               <button className="button" onClick={submitHandler}>
                 Submit for pdf report generation
               </button>
-
+             
              
             </div>
 
@@ -687,7 +732,11 @@ const ReportActivity =( )=>{
         </div>
       ) : null}
 
-
+{/* {latesfeedbackcount === "1" && (
+        <div>
+          <p>Feedback has been submitted</p>
+        </div>
+      )} */}
       {state.feedbackVisible && (
         <div className="feedback-section" >
           <FormControl component="fieldset">
@@ -708,6 +757,10 @@ const ReportActivity =( )=>{
           <button className="button" onClick={closeHandler2}>
             Submit
           </button>
+
+          
+          
+
         </div>
       )}
 
@@ -743,6 +796,9 @@ const ReportActivity =( )=>{
             {/* <button className="button" onClick={feedbackHandler}>
                 Feedback
               </button> */}
+              <button className="button-secondary" onClick={checkResults} style={{marginTop:"10px"}}>
+              Reports
+            </button>
             {/* <div className="FeedbackForm">
               <h1>Feedback</h1>
               <FeedbackForm />

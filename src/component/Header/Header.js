@@ -8,8 +8,9 @@ import { handleSignOut } from '../../service/Authservice';
 import EditOffSharpIcon from '@mui/icons-material/EditOffSharp';
 import SummarizeOutlinedIcon from '@mui/icons-material/SummarizeOutlined';
 import { checkResults } from '../Recorder/Recorderpage'
+import FeedbackIcon from '@mui/icons-material/Feedback';
 
-const Header = ({ checkResults }) => {
+const Header = ({ checkResults,feedbackHandler }) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
@@ -57,6 +58,11 @@ const Header = ({ checkResults }) => {
 
   const reports = () => {
     checkResults();
+    
+  }
+
+  const feedback =() =>{
+    feedbackHandler();
   }
   return (
     <div className="about">
@@ -103,6 +109,10 @@ const Header = ({ checkResults }) => {
             <SummarizeOutlinedIcon />
             &nbsp;&nbsp;<span>Reports</span>
           </button>
+          {/* <button className="logout-button" onClick={() => feedback()}>
+            <FeedbackIcon />
+            &nbsp;&nbsp;<span>Feedback</span>
+          </button> */}
           <button className="logout-button" onClick={() => onCloseHandler()}>
             <LogoutIcon />
             &nbsp;&nbsp;<span>Log out</span>
