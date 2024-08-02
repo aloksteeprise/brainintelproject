@@ -11,18 +11,21 @@ import jsPDF from 'jspdf';
 import { handlerLogs, submitFeedback, handleFetchUserAttributes } from '../../service/Authservice';
 import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Tooltip } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
-import pdf from '../../../src/document/consent.pdf'
+import { array } from 'prop-types';
+// import pdf from '../../../src/document/consent.pdf'
 let mediaRecorder;
 let audioCtx;
 
 function RecorderPage() {
 
   const [feedbackValue, setFeedbackValue] = useState('');
+  const [feedbackfilename , setFeedbackFilename ]= useState("")
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isChecked, setChecked] = useState(false);
   const [attributes, setAttributes] = useState(null); 
   const [showTable, setShowTable] = useState(false);
+  const [userfeedbackcount , setUserFeedbackcount ] = useState("0")
   const [headingText, setHeadingText] = useState('Kindly allow the microphone to record your voice');
   const [state, setState] = useState({
     startAnalysis: true,
@@ -161,7 +164,11 @@ function RecorderPage() {
     setState(prevState => ({
       ...prevState,
       feedbackVisible: true, // Show feedback section
-      completed: false // Hide main content
+      submitted: false, // Hide main content
+      startAnalysis: false,
+    recording: false,
+    completed: false,
+
     }));
   };
 
@@ -190,6 +197,7 @@ function RecorderPage() {
     }));
   };
 
+
   const submitHandler = () => {
     let name = getFileName();
     const folderName = getUserFolderName();
@@ -203,7 +211,11 @@ function RecorderPage() {
       if (err) {
         handlerLogs(`submitHandler > ` + err.stack);
       } else {
+        setFeedbackFilename(name);
+        debugger;
+        setUserFeedbackcount("0")
         handlerLogs(`submitHandler > ` + 'success');
+
         // createPdf(folderName,name)
       }
     });
@@ -213,6 +225,34 @@ function RecorderPage() {
       submitted: true,
     }));
   };
+
+
+  // const submitHandler = async () => {
+  //   let name = getFileName();
+  //   const folderName = getUserFolderName();
+  //   var params = {
+  //     Body: state.audioFile,
+  //     Bucket: albumBucketName,
+  //     Key: `${folderName}/${name + '.wav'}`,
+  //   };
+  
+  //   s3.putObject(params, async function (err, data) {
+  //     if (err) {
+  //       handlerLogs(`submitHandler > ` + err.stack);
+  //     } else {
+  //       setFeedbackFilename(name);
+  //       await submitFeedback("", "0");  // Reset to "0" on new submission
+  //       handlerLogs(`submitHandler > ` + 'success');
+  //     }
+  //   });
+  
+  //   setState((state) => ({
+  //     ...state,
+  //     completed: false,
+  //     submitted: true,
+  //   }));
+  // };
+  
 
   const createPdf = (folderName, name) => {
     const userInfo = getUserInfo();
@@ -281,15 +321,17 @@ function RecorderPage() {
     //let abc="BrainIntel" + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins+''+secs;
     // return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins;
     id = id.split('@')[0];
-    return id + '_' + dd + '' + mm + '' + yy + '' + hh + '' + mins + '' + secs;
+    return id + '_' + dd + '' + mm + '' + yy + '_' + hh + '' + mins + '' + secs;
   };
 
   const closeHandler = () => {
+    debugger;
     setState((state) => ({
       ...state,
       submitted: false,
       startAnalysis: true,
     }));
+    setChecked(false)
   };
 
 
@@ -301,12 +343,22 @@ function RecorderPage() {
   //   }));
   // };
 
-
   const  closeHandler2 =async () =>{
+    debugger;
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
-    let inputValue =id +'-'+feedbackValue;
-    let result = await submitFeedback(inputValue);
+    let array1=[];
+    let array2=[];
+    let fileName ='';
+    if(feedbackfilename && feedbackfilename.includes('_')){
+
+      fileName = feedbackfilename.split('_')[1] +'_'+feedbackfilename.split('_')[2];
+    }
+
+    let inputValue =fileName +'-'+feedbackValue;
+    setUserFeedbackcount("1");
+    debugger;
+    let result = await submitFeedback(inputValue , "1");
     setSnackbarMessage(result.message);
     setSnackbarOpen(true);
     setState((state) => ({
@@ -316,6 +368,12 @@ function RecorderPage() {
       feedbackVisible: false
     }));
   }
+
+
+
+
+
+  
 
   // const closeHandler2 = async () => {
   //   const userInfo = getUserInfo();
@@ -362,41 +420,37 @@ function RecorderPage() {
   const [s3Files, s3SetFiles] = useState([]);
 
 
-
-
   const checkResults = () => {
+    debugger;
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
     const folderName = getUserFolderName();
     s3.listObjects({ Prefix: folderName }, function (err, data) {
       if (err) {
-        return alert(
-          'There was a brutal error viewing your album: ' + err.message
-        );
+        return alert('There was a brutal error viewing your album: ' + err.message);
       } else {
-        handlerLogs(`checkResults > ` + data);
-
-        let r = [];
-        data.Contents.map((val) => {
-          // if (val.Key.includes('.pdf')) {
-          //   r.push(val.Key);
-          // }
-          if (val.Key) {
+        handlerLogs(`checkResults > ` + JSON.stringify(data));
+        const sortedContents = data.Contents.sort((a, b) => new Date(b.LastModified) - new Date(a.LastModified));
+       let r = [];
+        sortedContents.forEach((val) => {
+          if (val.Key && val.Key.endsWith('.pdf')) { // Only include PDF files
             r.push(val.Key);
           }
         });
-
+  
         if (r.length) {
           setResult([...r]);
         }
       }
     });
-
-    setState((state) => ({ ...state, completed: false, view: true, startAnalysis: false }));
+    setState((state) => ({ ...state, completed: false, view: true, startAnalysis: false,submitted:false ,  record: false,}));
   };
+  
+  
 
   const backtoStart = () => {
-    setState((state) => ({ ...state, view: false, startAnalysis: true }));
+    setState((state) => ({ ...state, view: false, startAnalysis: true}));
+    setChecked(false)
   };
 
 
@@ -471,13 +525,18 @@ function RecorderPage() {
     setChecked(!isChecked);
   };
 
+const ReportActivity =( )=>{
+  checkResults()
+  
+}
+
   return (
     <div className="App" style={{ paddingBottom: '80px', overflowY: 'auto' }}>
 
-      < Header checkResults={checkResults} />
+      < Header checkResults={checkResults} feedbackHandler={feedbackHandler}  />
       {/* first page */}
       {state.startAnalysis ? (
-        <div className="main-div" style={{ marginTop: '120px' }}>
+        <div className="main-div" >
           <div></div>
           <div className="first">
             <h1 className="head">Welcome { }</h1>
@@ -494,7 +553,7 @@ function RecorderPage() {
               />
               <label for="checkbox">
                 {' '}
-                I read and agree to the attached <a href={pdf} target="_blank"
+                I read and agree to the attached <a href='https://amplify-brainintelproject-dev-50421-deployment.s3.ap-south-1.amazonaws.com/consent.pdf' target="_blank"
 
                 >
                   Consent
@@ -524,7 +583,7 @@ function RecorderPage() {
 
       {/* 2nd page */}
       {state.record ? (
-        <div className="main-div" style={{ marginTop: '120px' }}>
+        <div className="main-div" >
           <div></div>
           <div className="first">
             <h1 className="head">{headingText}</h1>
@@ -596,7 +655,7 @@ function RecorderPage() {
 
       {/* 3rd page */}
       {state.completed ? (
-        <div className="main-div" style={{ marginTop: '120px' }}>
+        <div className="main-div" >
           <div></div>
           <div className="first">
             <h1 className="head">Recording Complete</h1>
@@ -608,21 +667,19 @@ function RecorderPage() {
             <audio id="audioEle" className="audio" />
             <div>
               <button className="button-secondary" onClick={recordAgainHandler}>
-                Record Again
+                Record Again, if not Audible
               </button>
               <br />
 
-              <button className="button-secondary" onClick={checkResults} style={{ marginTop: "5px" }}>
+              {/* <button className="button-secondary" onClick={checkResults} style={{ marginTop: "5px" }}>
                 Check Results
-              </button>
+              </button> */}
 
               <button className="button" onClick={submitHandler}>
                 Submit for pdf report generation
               </button>
 
-              {/* <button className="button" onClick={feedbackHandler}>
-                Feedback
-              </button> */}
+             
             </div>
 
           </div>
@@ -632,7 +689,7 @@ function RecorderPage() {
 
 
       {state.feedbackVisible && (
-        <div className="feedback-section" style={{ marginTop: '120px' }}>
+        <div className="feedback-section" >
           <FormControl component="fieldset">
             <h1 component="legend" className="head">Feedback on Report</h1>
             <RadioGroup
@@ -676,13 +733,16 @@ function RecorderPage() {
 
       {/* 4th page */}
       {state.submitted ? (
-        <div className="main-div" style={{ marginTop: '120px' }}>
+        <div className="main-div" >
           <div></div>
           <div className="first">
             <h1 className="head">Check Your Reports</h1>
             <div className="para">
               Wait for 10 minutes for the report.
             </div>
+            {/* <button className="button" onClick={feedbackHandler}>
+                Feedback
+              </button> */}
             {/* <div className="FeedbackForm">
               <h1>Feedback</h1>
               <FeedbackForm />
@@ -695,7 +755,7 @@ function RecorderPage() {
         </div>
       ) : null}
       {state.view ? (
-        <div className="main-div" style={{ marginTop: '120px' }}>
+        <div className="main-div" >
           <div></div>
           <div className="first">
             <h1 className="head">Click to Check the PDF Report</h1>

@@ -138,6 +138,9 @@ const validateEmailAdress=(event)=> {
             <Typography mt={15}>
               <HeaderLogin />
             </Typography>
+            <Typography mt={1}>
+              <p className="subheading">Beta Version 1.0</p>
+            </Typography>
             <Typography mt={4}>
               <p className="subheading">{config.loginSubheading}</p>
             </Typography>
