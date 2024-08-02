@@ -8,7 +8,7 @@ import AWS from 'aws-sdk';
 import Header from '../Header/Header';
 import Footer from './Footer.js';
 import jsPDF from 'jspdf';
-import { handlerLogs, submitFeedback, handleFetchUserAttributes ,latestUserAttributes} from '../../service/Authservice';
+import { handlerLogs, submitFeedback, handleFetchUserAttributes } from '../../service/Authservice';
 import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Tooltip } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import { array } from 'prop-types';
@@ -162,7 +162,7 @@ function RecorderPage() {
   };
 
   const feedbackHandler = () => {
-    fetchFeedbackStatus();
+    // fetchFeedbackStatus();
     setState(prevState => ({
       ...prevState,
       feedbackVisible: true, // Show feedback section
@@ -397,25 +397,25 @@ function RecorderPage() {
   //   fetchFeedbackStatus();
   // }, []);
 
-  const fetchFeedbackStatus = async () => {
-    try {
-      const userAttributes = await latestUserAttributes();
-      const feedbackStatus = userAttributes['custom:LatestFeedback'];
-      setLatestFeedbackcount(feedbackStatus);
-      console.log('Latest Feedback Value:', feedbackStatus); // Log the value
+  // const fetchFeedbackStatus = async () => {
+  //   try {
+  //     const userAttributes = await latestUserAttributes();
+  //     const feedbackStatus = userAttributes['custom:LatestFeedback'];
+  //     setLatestFeedbackcount(feedbackStatus);
+  //     console.log('Latest Feedback Value:', feedbackStatus); // Log the value
 
-      // Hide feedback section if feedbackStatus is 1
-      if (feedbackStatus === "1") {
-        setState((prevState) => ({ ...prevState, feedbackVisible: false }));
-      }
-    } catch (error) {
-      console.error('Error fetching user attributes:', error);
-    }
-  };
+  //     // Hide feedback section if feedbackStatus is 1
+  //     if (feedbackStatus === "1") {
+  //       setState((prevState) => ({ ...prevState, feedbackVisible: false }));
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching user attributes:', error);
+  //   }
+  // };
 
-  useEffect(() => {
-    fetchFeedbackStatus();
-  }, []);
+  // useEffect(() => {
+  //   fetchFeedbackStatus();
+  // }, []);
 
 
   
