@@ -1,7 +1,7 @@
 import axios from 'axios';
 import jwtDecode from 'jwt-decode';
 
-import { fetchAuthSession, getCurrentUser, signIn, signOut, verifyTOTPSetup, signUp,confirmSignUp,updateUserAttributes,currentAuthenticatedUser,getUserAttributes  } from 'aws-amplify/auth';
+import { fetchAuthSession, getCurrentUser, signIn, signOut, verifyTOTPSetup, signUp,confirmSignUp,updateUserAttributes,currentAuthenticatedUser  } from 'aws-amplify/auth';
 import { Amplify } from 'aws-amplify';
 import AWS from 'aws-sdk';
 import awsconfig from '../aws-exports';
@@ -44,68 +44,27 @@ const host = 'https://velocite.link/';
 
 
 export const login = async (username, password) => {
-  //   const response = await axios.post(`${host}users/login`, {
-  
-  /*const response = await axios.post(
-    `https://dqxrg92yu7.execute-api.ap-south-1.amazonaws.com/prod/login`,
-    {
-      email: username,
-      password: password,
-    }
-  );
-  */
+  try {
+    const response = await signIn({ username: username, password: password });
 
-
-
- 
-  const response = await signIn({ username: username, password: password})
-  .then(user => {
-    debugger;
-    console.log('User signed in:', user);
-    // Proceed to update user attributes
-    return user;
-  })
-  .catch(err => console.log(err));
-
-  let result;
-
-  if (response && response.isSignedIn) {
-    console.log('success');
-    // const headers = response?.headers;
-    // const authHeader = String(response.headers['authorization'] || '');
-    // if (authHeader.startsWith('Bearer ')) {
-    //   const token = authHeader.substring(7, authHeader.length);
-    //   const payload = jwtDecode(token);
-    //   localStorage.setItem('userInfo', payload?.sub);
-    //   const userObject = { userId: headers.userid, userInfo: payload?.sub };
-    //   localStorage.setItem('userObject', JSON.stringify(userObject));
-    // }
-    
-    result = '1-'+username;
-    if(response.isSignedIn){
+    if (response && response.isSignedIn) {
+      console.log('User signed in:', response);
       const userObject = { userId: username, userInfo: "" };
       localStorage.setItem('userObject', JSON.stringify(userObject));
-
+      return `1-${username}`;
+    } else if (response && response.nextStep.signInStep === 'CONFIRM_SIGN_UP') {
+      console.log('Email id is not verified.');
+      return '0-Email id is not verified.';
+    } else {
+      console.log('Invalid username and password.');
+      return '0-Invalid username and password.';
     }
-  } 
-  else {
-    if(response){
-      const userObject = { userId: "", userInfo: "" };
-      localStorage.setItem('userObject', JSON.stringify(userObject));
-      if(response.nextStep.signInStep = 'CONFIRM_SIGN_UP'){
-        result = '0-'+'Email id is not verified.';
-
-      }
-      else{
-        result = '0-'+'Invalid username and password';
-
-      }
-    }
-    
+  } catch (error) {
+    console.error('Error during sign in:', error);
+    return `0-${error.message}`;
   }
-
-  return result;
 };
+
 
 export const verifyEmail = async (email, verificationCode) => {
   const response =await confirmSignUp({
@@ -180,7 +139,7 @@ export const handleUpdatePassword = async  (oldPassword, newPassword) =>{
 
 export const register = async (email, password) => {
  
-  debugger;
+ 
   const response = await signUp({
     username: email, // Assuming email as the username
     password: password,
@@ -388,21 +347,133 @@ const getLoggerFileName=()=>{
 }
 
 
-export const submitFeedback = async (feedbackValue) => {
-  debugger;
+export const submitFeedback = async (feedbackValue,userfeedbackcount) => {
+  
   try {
+   
+    const userAttributes= await  handleFetchUserAttributes();
+    let userAttribute = userAttributes['custom:Userfeedback'];
+   
+  if(userAttribute!==undefined && userAttribute.length>0)
+    {
+      let lastChar = userAttribute.substring(userAttribute.length - 1);
+      if(lastChar.includes(';'))
+      {
+        userAttribute = userAttribute.substring(userAttribute,userAttribute.length - 1);
+      }
+      userAttribute = userAttribute +';'+feedbackValue;
+      if(userAttribute.length>2048){
+        console.log('storage has been fulled');
+      }
+      else{
+        await updateUserAttributes({
+    
+          userAttributes: {
+            family_name:feedbackValue,
+            ['custom:Userfeedback']: userAttribute,
+            ['custom:LatestFeedback']: userfeedbackcount,
+            
+          }
+        });
+  
+      }
+      console.log('Feedback submitted successfully');
+      return { success: true, message: 'Feedback submitted successfully' };
+    }
+    else if(userAttribute == undefined){
       await updateUserAttributes({
+    
         userAttributes: {
-          ['custom:Userfeedback']: feedbackValue
+          family_name:feedbackValue,
+          ['custom:Userfeedback']: feedbackValue,
+          ['custom:LatestFeedback']: userfeedbackcount
         }
       });
+      return { success: true, message: 'Feedback submitted successfully' };
+    }
+    else{
+      return { success: false, message: 'Feedback not submitted' };
 
-    console.log('Feedback submitted successfully');
-    return { success: true, message: 'Feedback submitted successfully' };
+    }
+    
+    
+    //console.log(userAttribute.length)
+    
+  
+    
+   
+     
+
+    
+    
   } 
   catch (error) {
     console.log('Error submitting feedback:', error);
     return { success: false, message: 'Error submitting feedback' };
    
   }
+};
+
+export const handleFetchUserAttributes = async function () {
+  try {
+    const userAttributes = await fetchUserAttributes();
+    return userAttributes;
+   
+
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+
+
+export const latestUserAttributes = async function () {
+  try {
+    const userAttributes = await fetchUserAttributes();
+    let userAttribute = userAttributes['custom:LatestFeedback'];
+    // console.log(userAttributes);
+    return userAttributes;
+   
+
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+// export const submitLatestFeedback = async (feedbackValue) => {
+//  
+//   try {
+//       await updateUserAttributes({
+//         userAttributes: {
+//           ['custom:Userfeedback']: feedbackValue
+//         }
+//       });
+
+//     console.log('Feedback submitted successfully');
+//     return { success: true, message: 'Feedback submitted successfully' };
+//   } 
+//   catch (error) {
+//     console.log('Error submitting feedback:', error);
+//     return { success: false, message: 'Error submitting feedback' };
+   
+//   }
+// };
+
+export const submitLoginUserAttributeFeedback = async (inputvalue) => {
+  
+  try {
+
+     updateUserAttributes({
+      userAttributes: {
+        family_name:inputvalue
+    }
+  });
+  } 
+  catch (error) {
+    console.log('Error submitting feedback:', error);
+    return { success: false, message: 'Error submitting feedback' };
+  }
+
 };

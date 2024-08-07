@@ -165,49 +165,49 @@ background-image: url('../../images/bic.jpeg');
 }
 
 
-// .table-container {
-//   display: flex;
-//   justify-content: center;
-//   margin-top: 120px;
-//   width: 100%;
-//   overflow-x: auto; /* Enables horizontal scrolling on smaller screens */
-// }
+.table-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 120px;
+  width: 100%;
+  overflow-x: auto; /* Enables horizontal scrolling on smaller screens */
+}
 
-// .table {
-//   width: 100%;
-//   max-width: 800px; /* Adjust as needed */
-//   border-collapse: collapse;
-//   background-color: #fff;
-// }
+.table {
+  width: 100%;
+  max-width: 800px; /* Adjust as needed */
+  border-collapse: collapse;
+  background-color: #fff;
+}
 
-// .table th, .table td {
-//   padding: 12px;
-//   text-align: left;
-//   border: 1px solid #ddd;
-// }
+.table th, .table td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
 
-// .table th {
-//   background-color: #2f80d1;
-//   color: #fff;
-// }
+.table th {
+  background-color: #2f80d1;
+  color: #fff;
+}
 
-// .table td {
-//   background-color: #f9f9f9;
-// }
+.table td {
+  background-color: #f9f9f9;
+}
 
-// .table-striped tbody tr:nth-of-type(odd) {
-//   background-color: #f2f2f2;
-// }
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f2f2f2;
+}
 
-// .table-bordered {
-//   border: 1px solid #ddd;
-// }
+.table-bordered {
+  border: 1px solid #ddd;
+}
 
-// .table-hover tbody tr:hover {
-//   background-color: #e9ecef;
-// }
+.table-hover tbody tr:hover {
+  background-color: #e9ecef;
+}
 
-// .thead-dark th {
-//   background-color: #3a82c9;
-//   color: #fff;
-// }
+.thead-dark th {
+  background-color: #3a82c9;
+  color: #fff;
+}

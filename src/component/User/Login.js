@@ -65,54 +65,52 @@ const Login = () => {
     if (!validateEmail(username)) {
       setError('Invalid email');
       return false;
-    }
-    else{
+    } else {
       setChecked(true);
       try {
-          setError('');
-          const response = await login(username, password);
-          setUnauthError('');
-          let isResult='0';
-          let isResultMessage='';
+        setError('');
+        const response = await login(username, password);
+        setUnauthError('');
+        let isResult = '0';
+        let isResultMessage = '';
+  
+        if (response) {
+          const parts = response.split('-');
+          isResult = parts[0];
+          isResultMessage = parts[1] || 'An unexpected error occurred'; // Provide a default error message if undefined
+        }
+  
+        if (isResult === '1') {
+          const logMessage = 'Successful login';
+          handlerLogs(logMessage);
           
-          if(response){
-              isResult = response.split('-')[0];
-              isResultMessage = response.split('-')[1];
-            }
-            if(isResult=='1'){
-              let LogMessage = 'Success full login'
-              handlerLogs(LogMessage);
-              navigate('/record');
-              localStorage.setItem('login',true);
-            }
-            else{
-              if(isResultMessage=='Email id is not verified.'){
-                setError(isResultMessage);
-                setUnauthError('Email id is not verified');
-                setChecked(false);
-              }
-              else{
-                setError(isResultMessage);
-                setChecked(false);
-                setUnauthError('');
-                handlerLogs(isResultMessage);
-              }
-              
-            }
-     
+          navigate('/record');
+          localStorage.setItem('login', true);
+        } else {
+          if (isResultMessage === 'Email id is not verified.') {
+            setError(isResultMessage);
+            setUnauthError('Email id is not verified');
+          } else {
+            setError(isResultMessage);
+            setUnauthError('');
+          }
+          setChecked(false);
+          handlerLogs(isResultMessage);
+        }
       } catch (error) {
         setChecked(false);
-        localStorage.setItem('login','');
+        localStorage.setItem('login', '');
         if (username.length === 0 || password.length === 0) {
           setError('Please fill in both the fields');
         } else {
-          setError(error.message);
-          // setError('Invalid Credentials');
+          const errorMessage = error?.message || 'An unexpected error occurred';
+          setError(errorMessage);
+          handlerLogs(errorMessage);
         }
-        handlerLogs(error.message);
       }
     }
   };
+  
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();

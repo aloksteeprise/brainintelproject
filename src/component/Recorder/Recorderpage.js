@@ -8,10 +8,11 @@ import AWS from 'aws-sdk';
 import Header from '../Header/Header';
 import Footer from './Footer.js';
 import jsPDF from 'jspdf';
-import { handlerLogs, submitFeedback, handleFetchUserAttributes } from '../../service/Authservice';
+import { handlerLogs, submitFeedback, handleFetchUserAttributes, latestUserAttributes,submitLoginUserAttributeFeedback } from '../../service/Authservice';
 import { Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Tooltip } from '@mui/material';
 import Snackbar from '@mui/material/Snackbar';
 import { array } from 'prop-types';
+import { red } from '@mui/material/colors';
 // import pdf from '../../../src/document/consent.pdf'
 let mediaRecorder;
 let audioCtx;
@@ -19,14 +20,17 @@ let audioCtx;
 function RecorderPage() {
 
   const [feedbackValue, setFeedbackValue] = useState('');
-  const [feedbackfilename , setFeedbackFilename ]= useState("")
+  const [feedbackbuttonenable,setFeedbackButtonEnable ] =useState(false)
+  const [feedbackError, setFeedbackError] = useState(null);
+  const [feedbackData, setFeedbackData] = useState([]);
+  const [feedbackfilename, setFeedbackFilename] = useState("")
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isChecked, setChecked] = useState(false);
-  const [attributes, setAttributes] = useState(null); 
+  const [attributes, setAttributes] = useState(null);
   const [showTable, setShowTable] = useState(false);
-  const [userfeedbackcount , setUserFeedbackcount ] = useState("0")
-  const [latesfeedbackcount , setLatestFeedbackcount ] = useState("")
+  const [userfeedbackcount, setUserFeedbackcount] = useState("0")
+  const [latesfeedbackcount, setLatestFeedbackcount] = useState("")
   const [headingText, setHeadingText] = useState('Kindly allow the microphone to record your voice');
   const [state, setState] = useState({
     startAnalysis: true,
@@ -37,6 +41,8 @@ function RecorderPage() {
     view: false,
     audioFile: null,
     feedbackVisible: false,
+    feedbacktable: false,
+    headingvisible: false
 
   });
 
@@ -66,9 +72,6 @@ function RecorderPage() {
     apiVersion: '2012-10-17',
     params: { Bucket: albumBucketName },
   });
-  // const mimeType = audioRecorder.mediaRecorder.mimeType; // Check if this indeed is 'audio/wav'
-  // const mediaRecorder =
-
   useEffect(() => {
     const initializeMediaRecorder = async () => {
       try {
@@ -148,6 +151,8 @@ function RecorderPage() {
       ...state,
       startAnalysis: false,
       record: true,
+      feedbacktable: false,
+      headingvisible: false
     }));
   };
 
@@ -161,21 +166,87 @@ function RecorderPage() {
     stopRecording();
   };
 
-  const feedbackHandler = () => {
-    // fetchFeedbackStatus();
-    setState(prevState => ({
-      ...prevState,
-      feedbackVisible: true, // Show feedback section
-      submitted: false, // Hide main content
-      startAnalysis: false,
-    recording: false,
-    completed: false,
+  const feedbackHandler = async () => {
+    //const userInfo = getUserInfo();
+    //let id = userInfo?.userId;
+    // const folderName = getUserFolderName();
+    //const pdfCount = await s3.listAndCountFiles(albumBucketName, folderName);
+    //const pdfCount = await listAndCountFiles('', folderName);
 
-    }));
-  
+    //const pdfCount =  s3.listAndCountFiles({ Prefix: folderName });
+    let sortedContents = 0;
+    debugger;
+    const userInfo = getUserInfo();
+    let id = userInfo?.userId;
+    const folderName = getUserFolderName();
+    s3.listObjects({ Prefix: folderName }, function (err, data) {
+      if (err) {
+        return alert('There was a brutal error viewing your album: ' + err.message);
+      } else {
+        handlerLogs(`checkResults > ` + JSON.stringify(data));
+        const sortedContents = data.Contents.sort((a, b) => new Date(b.LastModified) - new Date(a.LastModified));
+        let r = [];
+        sortedContents.forEach((val) => {
+          if (val.Key && val.Key.endsWith('.pdf')) {
+            r.push(val.Key);
+          }
+        });
+        if (r.length) {
+          fetchFeedbackStatus();
+          setFeedbackValue("")
+          setState(prevState => ({
+            ...prevState,
+            feedbackVisible: true, // Show feedback section
+            submitted: false, // Hide main content
+            startAnalysis: false,
+            recording: false,
+            completed: false,
+            headingvisible: true
+
+          }));
+        }
+       
+        else {
+
+          alert('There is no files for feedback.')
+        }
+      }
+    });
+
+
+
+
+
+
+
   };
 
+  useEffect(() => {
+    checkuserloginuser();
 
+  }, []);
+
+  const checkuserloginuser = async () => {
+
+    const loginUserAttribute = await handleFetchUserAttributes();
+    debugger;
+    if (loginUserAttribute != null) {
+
+      if ("family_name" in loginUserAttribute) {
+        console.log("yes")
+        if(loginUserAttribute.family_name !="0"){
+          setFeedbackButtonEnable(true)
+        }
+    
+      }
+      else {
+        console.log("no")
+        setFeedbackButtonEnable(false);
+         submitLoginUserAttributeFeedback('0');
+      }
+      
+    }
+  }
 
   const handleFeedbackChange = (event) => {
     setFeedbackValue(event.target.value);
@@ -215,7 +286,7 @@ function RecorderPage() {
   //       handlerLogs(`submitHandler > ` + err.stack);
   //     } else {
   //       setFeedbackFilename(name);
-  //       debugger;
+  //      
   //       setUserFeedbackcount("0")
   //       handlerLogs(`submitHandler > ` + 'success');
 
@@ -238,24 +309,34 @@ function RecorderPage() {
       Bucket: albumBucketName,
       Key: `${folderName}/${name + '.wav'}`,
     };
-  
+
     s3.putObject(params, async function (err, data) {
       if (err) {
         handlerLogs(`submitHandler > ` + err.stack);
       } else {
+        setFeedbackButtonEnable(false);
+        setTimeout(function(){ 
+        setFeedbackButtonEnable(true)
+        submitLoginUserAttributeFeedback('1');
+      },10000)
         setFeedbackFilename(name);
-        // await submitFeedback("", "0");  // Reset to "0" on new submission
+
+        await submitFeedback("", "0");
+        
         handlerLogs(`submitHandler > ` + 'success');
+        //checkuserloginuser();
+       
       }
     });
-  
+
     setState((state) => ({
       ...state,
       completed: false,
       submitted: true,
+
     }));
   };
-  
+
 
   const createPdf = (folderName, name) => {
     const userInfo = getUserInfo();
@@ -328,7 +409,7 @@ function RecorderPage() {
   };
 
   const closeHandler = () => {
-    debugger;
+
     setState((state) => ({
       ...state,
       submitted: false,
@@ -346,34 +427,80 @@ function RecorderPage() {
   //   }));
   // };
 
-
+  const getLatestWavFile = async (bucketName, prefix) => {
+    const params = {
+      Bucket: albumBucketName,
+      Prefix: prefix
+    };
+  
+    try {
+      // List objects in the bucket with the specified prefix
+      const data = await s3.listObjectsV2(params).promise();
+      
+      // Filter WAV files
+      const wavFiles = data.Contents.filter(item => item.Key.endsWith('.wav'));
+  
+      // Sort by LastModified date in descending order
+      wavFiles.sort((a, b) => new Date(b.LastModified) - new Date(a.LastModified));
+  
+      // Return the date and time part of the latest WAV file without the .wav extension
+      if (wavFiles.length > 0) {
+        const latestFileName = wavFiles[0].Key.split('/').pop();
+        const dateAndTimePart = latestFileName.split('_').slice(1).join('_').replace('.wav', ''); // Extract date and time part and remove .wav
+        return dateAndTimePart;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error listing objects:', error);
+      return null; // Return null if there's an error
+    }
+  };
+  
+  
   
 
-  const  closeHandler2 =async () =>{
-    debugger;
+  const submitfeedbackhandler = async () => {
     const userInfo = getUserInfo();
-    let id = userInfo?.userId;
-    let array1=[];
-    let array2=[];
-    let fileName ='';
-    if(feedbackfilename && feedbackfilename.includes('_')){
-
-      fileName = feedbackfilename.split('_')[1] +'_'+feedbackfilename.split('_')[2];
+    const id = userInfo?.userId;
+    const folderName = getUserFolderName();
+    console.log(id);
+    
+    // Get the latest WAV file with only the date and time part
+    const latestWavFile = await getLatestWavFile(albumBucketName, folderName);
+  
+    if (!latestWavFile) {
+      setFeedbackError("No WAV file found");
+      return;
     }
-
-    let inputValue =fileName +'-'+feedbackValue;
+  
+    const inputValue = latestWavFile + '-' + feedbackValue;
+  
+    if (!feedbackValue) {
+      setFeedbackError("Feedback % not selected");
+      return;
+    }
+  
     setUserFeedbackcount("1");
-    debugger;
-    let result = await submitFeedback(inputValue , "1");
+    console.log(inputValue, "Akash2");
+  
+    let result = await submitFeedback(inputValue, "1");
     setSnackbarMessage(result.message);
     setSnackbarOpen(true);
+    setChecked(false);
+  
     setState((state) => ({
       ...state,
-      completed: true,
-      
-      feedbackVisible: false
+      completed: false,
+      startAnalysis: true,
+      feedbacktable: false,
+      feedbackVisible: false,
+      headingvisible: false
     }));
-  }
+  };
+  
+  
+  
 
 
 
@@ -397,54 +524,120 @@ function RecorderPage() {
   //   fetchFeedbackStatus();
   // }, []);
 
+
   // const fetchFeedbackStatus = async () => {
   //   try {
   //     const userAttributes = await latestUserAttributes();
-  //     const feedbackStatus = userAttributes['custom:LatestFeedback'];
-  //     setLatestFeedbackcount(feedbackStatus);
-  //     console.log('Latest Feedback Value:', feedbackStatus); // Log the value
+  //     console.log(userAttributes)
+  //     setLatestFeedbackcount(userAttributes);
 
-  //     // Hide feedback section if feedbackStatus is 1
+  //     const feedbackString = userAttributes['custom:Userfeedback'];
+  //     const feedbackStatus = userAttributes['custom:LatestFeedback'];
   //     if (feedbackStatus === "1") {
   //       setState((prevState) => ({ ...prevState, feedbackVisible: false }));
   //     }
+  //     const email = userAttributes['email'];
+  //     const emailPrefix = email.split('@')[0];
+
+  //     const feedbackEntries = formatteddate.split(';').filter(entry => entry !== "");
+  //   
+  //     const processedFeedbackData = feedbackEntries.map(entry => {
+  //       const [customFeedback, percentage] = entry.split('-');
+  //       return {
+  //         customFeedback: `${emailPrefix}_${customFeedback}`,
+  //         percentage
+  //       };
+  //     });
+  //     setFeedbackData(processedFeedbackData);
+
+  //     if (feedbackStatus === "1") {
+  //       setState(prevState => ({ ...prevState, feedbackVisible: false, feedbacktable: true,headingvisible:true }));
+  //     } else {
+  //       setState(prevState => ({ ...prevState, feedbackVisible: true, feedbacktable: true,headingvisible:true }));
+  //     }
+
+
   //   } catch (error) {
   //     console.error('Error fetching user attributes:', error);
   //   }
   // };
 
+  const fetchFeedbackStatus = async () => {
+    try {
+      const userAttributes = await latestUserAttributes();
+      console.log(userAttributes);
+      setLatestFeedbackcount(userAttributes);
+
+      const feedbackString = userAttributes['custom:Userfeedback'];
+      const feedbackStatus = userAttributes['custom:LatestFeedback'];
+      // if (feedbackStatus === "1") {
+      //   setState((prevState) => ({ ...prevState, feedbackVisible: false }));
+      // }
+      // if (!feedbackString) {
+      //   setState(prevState => ({ ...prevState, feedbackVisible: false,headingvisible:true }));
+      //   return; 
+      // }
+      const email = userAttributes['email'];
+      const emailPrefix = email.split('@')[0];
+
+      const feedbackEntries = feedbackString.split(';').filter(entry => entry !== "");
+
+      const processedFeedbackData = feedbackEntries.map(entry => {
+        const [customFeedback, percentage] = entry.split('-');
+        const timestamp = customFeedback;
+        // console.log(timestamp)
+        return {
+          customFeedback: `${emailPrefix}_${customFeedback}`,
+          percentage,
+          timestamp
+        };
+      });
+
+
+      const sortedFeedbackData = processedFeedbackData.sort((a, b) => {
+
+        const dateA = convertTimestamp(a.timestamp);
+        const dateB = convertTimestamp(b.timestamp);
+        return dateB - dateA;
+      });
+
+      setFeedbackData(sortedFeedbackData);
+
+      if (feedbackStatus === "1") {
+        setState(prevState => ({ ...prevState, feedbackVisible: false, feedbacktable: true, headingvisible: true }));
+      } else {
+        setState(prevState => ({ ...prevState, feedbackVisible: true, feedbacktable: true, headingvisible: true }));
+      }
+    } catch (error) {
+      console.error('Error fetching user attributes:', error);
+    }
+  };
+
   // useEffect(() => {
   //   fetchFeedbackStatus();
   // }, []);
 
+  const convertTimestamp = (timestamp) => {
+    if (!timestamp) {
 
-  
+      return null;
+    }
+    const [datePart, timePart] = timestamp.split('_');
 
-  // const closeHandler2 = async () => {
-  //   const userInfo = getUserInfo();
-  //   let id = userInfo?.userId;
-  //   let inputValue = id + '-' + feedbackValue;
-  //   let result = await submitFeedback(inputValue);
-  //   setSnackbarMessage(result.message);
-  //   setSnackbarOpen(true);
+    const day = parseInt(datePart.slice(0, 2), 10);
+    const month = parseInt(datePart.slice(2, 4), 10) - 1; // months are 0-based
+    const year = parseInt(datePart.slice(4, 6), 10); // Assuming year is in 2000s
+    const hour = parseInt(timePart.slice(0, 2), 10);
+    const minute = parseInt(timePart.slice(2, 4), 10);
+    const second = parseInt(timePart.slice(4, 6), 10);
+    const dateObject = new Date(year, month, day, hour, minute, second);
+    // console.log(dateObject,"Akash")
+    return dateObject;
+  };
 
-  //   if (result.success) {
-  //     try {
-  //       const userAttributes = await handleFetchUserAttributes();
-  //       setAttributes(userAttributes);
-  //       setShowTable(true);
-  //       setState((state) => ({
-  //         ...state,
 
-  //         feedbackVisible: false
-  //       }));
 
-  //     } catch (error) {
-  //       console.error('Error fetching user attributes:', error);
-  //       setAttributes(null);
-  //     }
-  //   }
-  // };
+
   const getFeedbackValue = (feedback) => {
     if (feedback) {
       const parts = feedback.split('-');
@@ -466,7 +659,7 @@ function RecorderPage() {
 
 
   const checkResults = () => {
-    debugger;
+
     const userInfo = getUserInfo();
     let id = userInfo?.userId;
     const folderName = getUserFolderName();
@@ -476,25 +669,30 @@ function RecorderPage() {
       } else {
         handlerLogs(`checkResults > ` + JSON.stringify(data));
         const sortedContents = data.Contents.sort((a, b) => new Date(b.LastModified) - new Date(a.LastModified));
-       let r = [];
+        let r = [];
         sortedContents.forEach((val) => {
           if (val.Key && val.Key.endsWith('.pdf')) { // Only include PDF files
             r.push(val.Key);
           }
         });
-  
+
         if (r.length) {
           setResult([...r]);
         }
       }
     });
-    setState((state) => ({ ...state, completed: false, view: true, startAnalysis: false,submitted:false ,  recording: false,}));
+    setState((state) => ({ ...state, completed: false, view: true, startAnalysis: false, submitted: false, recording: false, }));
   };
-  
-  
+
+
 
   const backtoStart = () => {
-    setState((state) => ({ ...state, view: false, startAnalysis: true}));
+    setState((state) => ({ ...state, view: false, startAnalysis: true }));
+    setChecked(false)
+  };
+
+  const backtoTable = () => {
+    setState((state) => ({ ...state, view: false, startAnalysis: true, headingvisible:false,feedbacktable:false }));
     setChecked(false)
   };
 
@@ -570,15 +768,15 @@ function RecorderPage() {
     setChecked(!isChecked);
   };
 
-const ReportActivity =( )=>{
-  checkResults()
-  
-}
+  const ReportActivity = () => {
+    checkResults()
+
+  }
 
   return (
     <div className="App" style={{ paddingBottom: '80px', overflowY: 'auto' }}>
 
-      < Header checkResults={checkResults} feedbackHandler={feedbackHandler}  />
+      < Header checkResults={checkResults} feedbackHandler={feedbackHandler} />
       {/* first page */}
       {state.startAnalysis ? (
         <div className="main-div" >
@@ -616,12 +814,21 @@ const ReportActivity =( )=>{
                 Click To Start
               </button>
 
+
+
             </Tooltip>
 
             <button className="button-secondary" onClick={checkResults}>
               Reports
             </button>
+            <br />
+
+
+          {feedbackbuttonenable?( <button className="button" onClick={feedbackHandler} style={{ margin: "20px auto" }}>
+              Feedback
+            </button>) :null}
           </div>
+
           <div></div>
         </div>
       ) : null}
@@ -723,8 +930,8 @@ const ReportActivity =( )=>{
               <button className="button" onClick={submitHandler}>
                 Submit for pdf report generation
               </button>
-             
-             
+
+
             </div>
 
           </div>
@@ -732,57 +939,78 @@ const ReportActivity =( )=>{
         </div>
       ) : null}
 
-{/* {latesfeedbackcount === "1" && (
+      {/* {latesfeedbackcount === "1" && (
         <div>
           <p>Feedback has been submitted</p>
         </div>
       )} */}
+      {state.headingvisible && (
+
+
+        <h1 component="legend" className="head">Feedback on Report</h1>
+      )}
+
+
+
+
       {state.feedbackVisible && (
         <div className="feedback-section" >
           <FormControl component="fieldset">
-            <h1 component="legend" className="head">Feedback on Report</h1>
+
             <RadioGroup
               aria-label="feedback"
               name="feedback"
               value={feedbackValue}
+
               onChange={handleFeedbackChange}
+              row
             >
               <FormControlLabel value="20" control={<Radio />} label="20%" />
               <FormControlLabel value="40" control={<Radio />} label="40%" />
               <FormControlLabel value="60" control={<Radio />} label="60%" />
               <FormControlLabel value="80" control={<Radio />} label="80%" />
             </RadioGroup>
+            {feedbackError && <p className="error" style={{ color: "red" }}>{feedbackError}</p>}
           </FormControl>
 
-          <button className="button" onClick={closeHandler2}>
+          <button className="button" onClick={submitfeedbackhandler}>
             Submit
           </button>
-
-          
-          
 
         </div>
       )}
 
-      {/* {showTable && attributes && (
+      {state.feedbacktable && (
+        <div >
+          {/* <h3>Feedback Table</h3> */}
+          <div style={{ display: "flex", justifyContent: "center" }}>
 
-        <div className='feedback-section' style={{display:"flex",justifyContent:"center",marginTop:"120px"}}>
-          <table className="table table-striped table-bordered table-hover">
-            <thead className="thead-dark">
-              <tr>
-                <th>Email</th>
-                <th>Feedback</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{attributes['email'] || 'N/A'}</td>
-                <td>{getFeedbackValue(attributes['custom:Userfeedback']) || 'N/A'}</td>
-              </tr>
-            </tbody>
-          </table>
+            <table className='table table-striped table-bordered table-hover'>
+              <thead className="thead-dark">
+                <tr>
+                  <th>Report</th>
+                  <th>Satisfaction Level</th>
+                </tr>
+              </thead>
+              <tbody>
+                {feedbackData.map((feedback, index) => (
+                  <tr key={index}>
+                    <td>{feedback.customFeedback}</td>
+                    <td>{feedback.percentage}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <button className="button" onClick={backtoTable}>
+              {' '}
+              Close
+            </button>
         </div>
-      )} */}
+        
+      )}
+
+
 
       {/* 4th page */}
       {state.submitted ? (
@@ -793,17 +1021,15 @@ const ReportActivity =( )=>{
             <div className="para">
               Wait for 10 minutes for the report.
             </div>
-            {/* <button className="button" onClick={feedbackHandler}>
-                Feedback
-              </button> */}
-              <button className="button-secondary" onClick={checkResults} style={{marginTop:"10px"}}>
+            <button className="button" onClick={checkResults} style={{ marginTop: "10px" }}>
               Reports
             </button>
-            {/* <div className="FeedbackForm">
-              <h1>Feedback</h1>
-              <FeedbackForm />
-            </div> */}
-            <button className="button" onClick={closeHandler}>
+            {feedbackbuttonenable?( <button className="button-secondary" onClick={feedbackHandler} style={{ margin: "20px auto" }}>
+              Feedback
+            </button>) :null}
+
+
+            <button className="button" onClick={closeHandler} style={{ marginTop: "41px" }}>
               Close
             </button>
           </div>

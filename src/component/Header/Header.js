@@ -109,10 +109,10 @@ const Header = ({ checkResults,feedbackHandler }) => {
             <SummarizeOutlinedIcon />
             &nbsp;&nbsp;<span>Reports</span>
           </button>
-          {/* <button className="logout-button" onClick={() => feedback()}>
+          <button className="logout-button" onClick={() => feedback()}>
             <FeedbackIcon />
             &nbsp;&nbsp;<span>Feedback</span>
-          </button> */}
+          </button>
           <button className="logout-button" onClick={() => onCloseHandler()}>
             <LogoutIcon />
             &nbsp;&nbsp;<span>Log out</span>
